@@ -1,7 +1,7 @@
 
 
 from classes import ClassInfo, Section, Teacher 
-from scheduler import generate_schedule
+from scheduler import generate_schedule, verify_schedule
 # ---------------------------------------------------------------------------
 # Dummy data (30-minute block grid: block 0 = 7:00am ... block 27 = 8:30pm)
 # ---------------------------------------------------------------------------
@@ -111,9 +111,18 @@ sections = [
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = generate_schedule(sections, classes, teachers)
 
-    print("Status:", result["status"])
+    result = generate_schedule(sections, classes, teachers)
+    conflicts = verify_schedule(result, sections, classes)
+
+    if conflicts:
+        print("SCHEDULE INVALID:")
+        for c in conflicts:
+            print(" -", c)
+    else:
+        print("Schedule verified clean.")
+
+    print("\nStatus:", result["status"])
     print()
 
     if result["status"] in ("OPTIMAL", "FEASIBLE"):

@@ -133,50 +133,54 @@ def generate_schedule(
                 model.Add(sum(day_vars) <= 1)
 
     # -----------------------------------------------------------------
-    # Constraint 3: no teacher double-booked (overlapping blocks),
-    # scoped by partial overlap
+    # Constraint 3: no teacher double-booked (interval-based, robust),
+    # scoped by partial -- sessions in non-overlapping partials never
+    # compete for the same teacher slot.
     # -----------------------------------------------------------------
     for t in teachers:
-        for day in range(NUM_DAYS):
-            for block in range(BLOCKS_PER_DAY):
-                for p in all_partials:
-                    vars_ = []
-                    for (sid, tid, d, start), v in assign.items():
-                        if tid != t.id or d != day:
-                            continue
-                        if p not in section_lookup[sid].partials:
-                            continue
-                        cls = class_lookup[section_lookup[sid].class_id]
-                        n_blocks = blocks_needed(cls.duration_minutes)
-                        if block in occupied_blocks(day, start, n_blocks):
-                            vars_.append(v)
-                    if len(vars_) > 1:
-                        model.Add(sum(vars_) <= 1)
+        for p in all_partials:
+            intervals = []
+            for (sid, tid, day, start), v in assign.items():
+                if tid != t.id:
+                    continue
+                if p not in section_lookup[sid].partials:
+                    continue
+                cls = class_lookup[section_lookup[sid].class_id]
+                n_blocks = blocks_needed(cls.duration_minutes)
+                global_start = day * BLOCKS_PER_DAY + start
+                interval = model.NewOptionalIntervalVar(
+                    global_start, n_blocks, global_start + n_blocks, v,
+                    f"ivl_teacher_{t.id}_{p}_{sid}_{day}_{start}"
+                )
+                intervals.append(interval)
+            if intervals:
+                model.AddNoOverlap(intervals)
 
     # -----------------------------------------------------------------
-    # Constraint 4: no student group double-booked (overlapping blocks),
-    # scoped by partial overlap. Grouped by (mayor, semester, group_number)
-    # across all classes -- see ASSUMPTION 1 above.
+    # Constraint 4: no student group double-booked (interval-based),
+    # scoped by partial. Grouped by (mayor, semester, group_number).
     # -----------------------------------------------------------------
     group_keys = {(s.mayor, s.semester, s.group_number) for s in sections}
     for key in group_keys:
         matching_ids = {s.id for s in sections
-                         if (s.mayor, s.semester, s.group_number) == key}
-        for day in range(NUM_DAYS):
-            for block in range(BLOCKS_PER_DAY):
-                for p in all_partials:
-                    vars_ = []
-                    for (sid, tid, d, start), v in assign.items():
-                        if sid not in matching_ids or d != day:
-                            continue
-                        if p not in section_lookup[sid].partials:
-                            continue
-                        cls = class_lookup[section_lookup[sid].class_id]
-                        n_blocks = blocks_needed(cls.duration_minutes)
-                        if block in occupied_blocks(day, start, n_blocks):
-                            vars_.append(v)
-                    if len(vars_) > 1:
-                        model.Add(sum(vars_) <= 1)
+                        if (s.mayor, s.semester, s.group_number) == key}
+        for p in all_partials:
+            intervals = []
+            for (sid, tid, day, start), v in assign.items():
+                if sid not in matching_ids:
+                    continue
+                if p not in section_lookup[sid].partials:
+                    continue
+                cls = class_lookup[section_lookup[sid].class_id]
+                n_blocks = blocks_needed(cls.duration_minutes)
+                global_start = day * BLOCKS_PER_DAY + start
+                interval = model.NewOptionalIntervalVar(
+                    global_start, n_blocks, global_start + n_blocks, v,
+                    f"ivl_group_{key}_{p}_{sid}_{day}_{start}"
+                )
+                intervals.append(interval)
+            if intervals:
+                model.AddNoOverlap(intervals)
 
     # -----------------------------------------------------------------
     # Constraint 5: teacher per-partial load cap
@@ -248,6 +252,33 @@ def generate_schedule(
             })
 
     return result
+
+
+def verify_schedule(result, sections, classes):
+    """Independently re-checks the solved schedule for teacher/group
+    overlaps. Returns a list of conflict descriptions (empty = clean)."""
+    class_lookup = {c.id: c for c in classes}
+    section_lookup = {s.id: s for s in sections}
+    conflicts = []
+
+    teacher_bookings = {}  # teacher_id -> list of (day, start, end, section_id)
+    for sid, info in result["by_section"].items():
+        cls = class_lookup[section_lookup[sid].class_id]
+        for sess in info["sessions"]:
+            teacher_bookings.setdefault(info["teacher"], []).append(
+                (sess["day"], sess["start_block"], sess["start_block"] + blocks_needed(cls.duration_minutes), sid)
+            )
+
+    for tid, bookings in teacher_bookings.items():
+        for i in range(len(bookings)):
+            for j in range(i + 1, len(bookings)):
+                d1, s1, e1, sid1 = bookings[i]
+                d2, s2, e2, sid2 = bookings[j]
+                if d1 == d2 and s1 < e2 and s2 < e1:
+                    conflicts.append(
+                        f"Teacher {tid} double-booked on day {d1}: {sid1} ({s1}-{e1}) overlaps {sid2} ({s2}-{e2})"
+                    )
+    return conflicts
 
 
 # def diagnose_infeasibility(
