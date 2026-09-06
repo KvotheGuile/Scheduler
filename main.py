@@ -1,32 +1,48 @@
 
 
 from classes import ClassInfo, Section, Teacher 
-from scheduler import generate_schedule, diagnose_infeasibility
+from scheduler import generate_schedule
+# ---------------------------------------------------------------------------
+# Dummy data (30-minute block grid: block 0 = 7:00am ... block 27 = 8:30pm)
+# ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-# Dummy data
-# ---------------------------------------------------------------------------
+DAY_START_HOUR = 7
+
+def time_range_to_blocks(start_hour, start_min, end_hour, end_min):
+    """Helper: convert a human time range into a list of block indices."""
+    start_block = (start_hour - DAY_START_HOUR) * 2 + (start_min // 30)
+    end_block = (end_hour - DAY_START_HOUR) * 2 + (end_min // 30)
+    return list(range(start_block, end_block))
+
 
 # --- Classes -----------------------------------------------------------
-# Mix of 1-partial, 2-partial, and full-semester classes
+# Mix of 90-min and 120-min durations, various sessions/week, various partial spans
 classes = [
-    ClassInfo(id="DATABASES",  hours_per_week=3, partials={1, 2, 3},  load=3.0, name="Databases"),
-    ClassInfo(id="ALGORITHMS", hours_per_week=3, partials={1, 2, 3},  load=3.0, name="Data Structures and Algorithsm"),
-    ClassInfo(id="ETHICS",     hours_per_week=2, partials={1},        load=2.0, name="Ethics and Engineering"),
-    ClassInfo(id="WEBDEV",     hours_per_week=2, partials={2, 3},     load=2.0, name="Web Development Torment"),
-    ClassInfo(id="CALC1",      hours_per_week=4, partials={1, 2, 3},  load=4.0, name="Basic Calculus"),
-    ClassInfo(id="PE",         hours_per_week=1, partials={2},        load=1.0, name="Pizza Eagles"),
+    ClassInfo(id="DATABASES",  duration_minutes=120, sessions_per_week=4, partials={2, 3}, load=3.0,  name="Databases Engineering"),
+    ClassInfo(id="ALGORITHMS", duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=3.0,  name="Algorithms and Data Structures"),
+    ClassInfo(id="ETHICS",     duration_minutes=90,  sessions_per_week=2, partials={1},        load=2.0, name="Ethics"),
+    ClassInfo(id="WEBDEV",     duration_minutes=90,  sessions_per_week=2, partials={2, 3},     load=2.0, name="Web Development"),
+    ClassInfo(id="CALC1",      duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=4.0,  name="Calculus I"),
+    ClassInfo(id="PE",         duration_minutes=90,  sessions_per_week=1, partials={2},        load=1.0, name="Pheasant Eagle"),
 ]
 
 # --- Teachers ------------------------------------------------------------
-# Availability as (day, period) tuples. Days 0-4 = Mon-Fri, periods 0-3 = time slots.
-# Some teachers have limited hours (simulating a second job).
+# Availability expressed as (day, block) tuples, days 0-4 = Mon-Fri.
+# Built via time_range_to_blocks(start_h, start_m, end_h, end_m) per day.
+
+def daily_availability(days, start_h, start_m, end_h, end_m):
+    """Same time window on each listed day."""
+    blocks = time_range_to_blocks(start_h, start_m, end_h, end_m)
+    return [(d, b) for d in days for b in blocks]
+
+
 teachers = [
     Teacher(
         id="T1_ana",
         name="Ana",
         can_teach={"DATABASES", "ALGORITHMS", "WEBDEV"},
-        availability=[(0, 0), (0, 1), (1, 0), (1, 1), (2, 0), (2, 1), (3, 0), (3, 1)],
+        # Free 8am-2pm, Mon-Thu
+        availability=daily_availability([0, 1, 2, 3], 8, 0, 14, 0),
         max_load_per_partial=6.0,
         max_load_total=15.0,
     ),
@@ -34,8 +50,8 @@ teachers = [
         id="T2_luis",
         name="Luis",
         can_teach={"ALGORITHMS", "CALC1"},
-        # Only free mornings (period 0) -- simulates afternoon outside job
-        availability=[(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)],
+        # Only free mornings 7-11am, all weekdays -- simulates afternoon outside job
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
         max_load_per_partial=4.0,
         max_load_total=10.0,
     ),
@@ -43,7 +59,11 @@ teachers = [
         id="T3_maria",
         name="Maria",
         can_teach={"ETHICS", "WEBDEV", "PE"},
-        availability=[(0, 1), (0, 2), (1, 1), (1, 2), (2, 1), (2, 2), (3, 1), (4, 1)],
+        # Free 9am-1pm and 5-7pm, Mon/Wed/Fri
+        availability=(
+            daily_availability([0, 2, 4], 9, 0, 13, 0)
+            + daily_availability([0, 2, 4], 17, 0, 19, 0)
+        ),
         max_load_per_partial=5.0,
         max_load_total=12.0,
     ),
@@ -51,22 +71,23 @@ teachers = [
         id="T4_carlos",
         name="Carlos",
         can_teach={"DATABASES", "CALC1", "PE"},
-        availability=[(0, 2), (0, 3), (1, 2), (1, 3), (2, 2), (2, 3), (3, 2), (3, 3), (4, 2), (4, 3)],
+        # Free all day, all weekdays -- most flexible teacher
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 20, 0),
         max_load_per_partial=8.0,
-        max_load_total=30.0
-    ),  
+        max_load_total=30.0,
+    ),
     Teacher(
-        id="T5_susana",
-        name="Susana",
-        can_teach={"CALC1"},
-        availability=[(0, 2), (0, 3), (1, 2), (1, 3), (2, 2), (2, 3), (3, 2), (3, 3), (4, 2), (4, 3)],
-        max_load_per_partial=7.0,
-        max_load_total=16.0,
-    )
+        id="T5_samantha",
+        name="Samantha",
+        can_teach={"DATABASES", "CALC1", "PE", "WEBDEV"},
+        # Free all day, all weekdays -- most flexible teacher
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
+        max_load_per_partial=12.0,
+        max_load_total=30.0,
+    ),
 ]
 
 # --- Sections --------------------------------------------------------------
-# Derived as if from mayor.json: (mayor, semester, class, group_number)
 sections = [
     # Software Engineering, semester 3 -- needs 2 groups of Databases
     Section(id="SE-3-DATABASES-g1", mayor="SE", semester=3, class_id="DATABASES", group_number=1, partials={1, 2, 3}),
@@ -74,12 +95,12 @@ sections = [
     Section(id="SE-3-ALGORITHMS-g1", mayor="SE", semester=3, class_id="ALGORITHMS", group_number=1, partials={1, 2, 3}),
     Section(id="SE-3-ETHICS-g1", mayor="SE", semester=3, class_id="ETHICS", group_number=1, partials={1}),
 
-    # Software Engineering, semester 1 -- different cohort, shares teacher pool
+    # Software Engineering, semester 1 -- different cohort
     Section(id="SE-1-CALC1-g1", mayor="SE", semester=1, class_id="CALC1", group_number=1, partials={1, 2, 3}),
     Section(id="SE-1-WEBDEV-g1", mayor="SE", semester=1, class_id="WEBDEV", group_number=1, partials={2, 3}),
     Section(id="SE-1-PE-g1", mayor="SE", semester=1, class_id="PE", group_number=1, partials={2}),
 
-    # Business Admin, semester 2 -- separate mayor entirely
+    # Business Admin, semester 2 -- separate mayor
     Section(id="BA-2-ETHICS-g1", mayor="BA", semester=2, class_id="ETHICS", group_number=1, partials={1}),
     Section(id="BA-2-CALC1-g1", mayor="BA", semester=2, class_id="CALC1", group_number=1, partials={1, 2, 3}),
 ]
@@ -90,24 +111,25 @@ sections = [
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = generate_schedule(sections, classes, teachers, max_time_in_seconds=1000)
+    result = generate_schedule(sections, classes, teachers)
 
     print("Status:", result["status"])
     print()
 
-    if result["status"] == "INFEASIBLE":
-        diagnose_infeasibility(sections, classes, teachers)
-
     if result["status"] in ("OPTIMAL", "FEASIBLE"):
+        day_names = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
         print("=== Schedule by section ===")
         for sid, info in result["by_section"].items():
-            print(f"{sid:25s} -> teacher {info['teacher']:10s} slots {info['slots']}")
+            print(f"{sid} -> teacher {info['teacher']}")
+            for sess in info["sessions"]:
+                print(f"    {day_names[sess['day']]} {sess['start_time']}-{sess['end_time']}")
 
         print()
         print("=== Schedule by teacher ===")
         for tid, entries in result["by_teacher"].items():
             print(f"{tid}:")
-            for sid, day, period in sorted(entries, key=lambda x: (x[1], x[2])):
-                print(f"    day {day}, period {period} -> {sid}")
+            for e in sorted(entries, key=lambda x: (x["day"], x["start_time"])):
+                print(f"    {day_names[e['day']]} {e['start_time']}-{e['end_time']} -> {e['section']}")
     else:
         print("No feasible schedule found with current constraints.")
