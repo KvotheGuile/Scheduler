@@ -4,10 +4,20 @@ from classes import ClassInfo, Section, Teacher
 
 SCALE = 100
 BLOCK_MINUTES = 30
-DAY_START_HOUR = 7
+DAY_START_HOUR = 7 # 7am
 DAY_END_HOUR = 21  # 9pm
 BLOCKS_PER_DAY = (DAY_END_HOUR - DAY_START_HOUR) * 60 // BLOCK_MINUTES  # 28
 NUM_DAYS = 5  # Mon-Fri
+
+# conversion of period annotation from excel to partial annotation
+PERIOD_TO_PARTIALS = {
+    1: {1},
+    2 : {2},
+    3: {3},
+    4: {1, 2},
+    5: {2, 3},
+    6: {1, 2, 3},
+}
 
 
 def blocks_needed(duration_minutes: int) -> int:
@@ -31,7 +41,16 @@ def valid_start_blocks(teacher:Teacher, day:int, n_blocks:int):
             starts.append(start)
     return starts
 
-
+""" Periodo is represented as an int (1-6) corresponding to:
+    1 = {1}
+    2 = {2}
+    3 = {3}
+    4 = {1, 2}
+    5 = {2, 3}
+    6 = {1, 2, 3}
+"""
+def period_to_partials(period: int) -> set[int]:
+    return  PERIOD_TO_PARTIALS[period]
 
 # ---------------------------------------------------------------------------
 # Scheduler
@@ -158,12 +177,12 @@ def generate_schedule(
 
     # -----------------------------------------------------------------
     # Constraint 4: no student group double-booked (interval-based),
-    # scoped by partial. Grouped by (mayor, semester, group_number).
+    # scoped by partial. Grouped by (major, semester, group_number).
     # -----------------------------------------------------------------
-    group_keys = {(s.mayor, s.semester, s.group_number) for s in sections}
+    group_keys = {(s.major, s.semester, s.group_number) for s in sections}
     for key in group_keys:
         matching_ids = {s.id for s in sections
-                        if (s.mayor, s.semester, s.group_number) == key}
+                        if (s.major, s.semester, s.group_number) == key}
         for p in all_partials:
             intervals = []
             for (sid, tid, day, start), v in assign.items():
