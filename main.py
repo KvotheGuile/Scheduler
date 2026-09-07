@@ -90,19 +90,19 @@ teachers = [
 # --- Sections --------------------------------------------------------------
 sections = [
     # Software Engineering, semester 3 -- needs 2 groups of Databases
-    Section(id="SE-3-DATABASES-g1", mayor="SE", semester=3, class_id="DATABASES", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-3-DATABASES-g2", mayor="SE", semester=3, class_id="DATABASES", group_number=2, partials={1, 2, 3}),
-    Section(id="SE-3-ALGORITHMS-g1", mayor="SE", semester=3, class_id="ALGORITHMS", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-3-ETHICS-g1", mayor="SE", semester=3, class_id="ETHICS", group_number=1, partials={1}),
+    Section(id="SE-3-DATABASES-g1", major="SE", semester=3, class_id="DATABASES", group_number=1, partials={1, 2, 3}),
+    Section(id="SE-3-DATABASES-g2", major="SE", semester=3, class_id="DATABASES", group_number=2, partials={1, 2, 3}),
+    Section(id="SE-3-ALGORITHMS-g1", major="SE", semester=3, class_id="ALGORITHMS", group_number=1, partials={1, 2, 3}),
+    Section(id="SE-3-ETHICS-g1", major="SE", semester=3, class_id="ETHICS", group_number=1, partials={1}),
 
     # Software Engineering, semester 1 -- different cohort
-    Section(id="SE-1-CALC1-g1", mayor="SE", semester=1, class_id="CALC1", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-1-WEBDEV-g1", mayor="SE", semester=1, class_id="WEBDEV", group_number=1, partials={2, 3}),
-    Section(id="SE-1-PE-g1", mayor="SE", semester=1, class_id="PE", group_number=1, partials={2}),
+    Section(id="SE-1-CALC1-g1", major="SE", semester=1, class_id="CALC1", group_number=1, partials={1, 2, 3}),
+    Section(id="SE-1-WEBDEV-g1", major="SE", semester=1, class_id="WEBDEV", group_number=1, partials={2, 3}),
+    Section(id="SE-1-PE-g1", major="SE", semester=1, class_id="PE", group_number=1, partials={2}),
 
-    # Business Admin, semester 2 -- separate mayor
-    Section(id="BA-2-ETHICS-g1", mayor="BA", semester=2, class_id="ETHICS", group_number=1, partials={1}),
-    Section(id="BA-2-CALC1-g1", mayor="BA", semester=2, class_id="CALC1", group_number=1, partials={1, 2, 3}),
+    # Business Admin, semester 2 -- separate major
+    Section(id="BA-2-ETHICS-g1", major="BA", semester=2, class_id="ETHICS", group_number=1, partials={1}),
+    Section(id="BA-2-CALC1-g1", major="BA", semester=2, class_id="CALC1", group_number=1, partials={1, 2, 3}),
 ]
 
 

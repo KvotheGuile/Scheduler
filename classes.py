@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class Section:
     id: str
-    mayor: str
+    major: str
     semester: int
     class_id: str
     group_number: int

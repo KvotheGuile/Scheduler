@@ -362,9 +362,9 @@ def verify_schedule(result, sections, classes):
 #                     model.Add(sum(vars_) <= 1).OnlyEnforceIf(a)
 #                     assumptions[label] = a
 
-#     group_keys = {(s.mayor, s.semester, s.group_number) for s in sections}
+#     group_keys = {(s.major, s.semester, s.group_number) for s in sections}
 #     for key in group_keys:
-#         matching = [s.id for s in sections if (s.mayor, s.semester, s.group_number) == key]
+#         matching = [s.id for s in sections if (s.major, s.semester, s.group_number) == key]
 #         for slot in all_slots:
 #             for p in all_partials:
 #                 vars_ = [v for (sid, tid, s), v in assign.items()
