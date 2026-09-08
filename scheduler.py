@@ -119,6 +119,36 @@ def generate_schedule(
                     )
 
     # -----------------------------------------------------------------
+    # Constraint: same class must occur at the same start_block every day
+    # it meets (e.g. always 10:00am on whichever days it runs).
+    # -----------------------------------------------------------------
+
+    # Collect the set of start_blocks that are actually reachable for each
+    # section (union over its qualified teachers, since we don't know yet
+    # which teacher will be assigned).
+    section_possible_starts = {}
+    for s in sections:
+        starts = {start for (sid, tid, day, start) in assign if sid == s.id}
+        section_possible_starts[s.id] = starts
+
+    # uses_start[section_id, start_block] = 1 if this section's fixed daily
+    # time is `start_block`
+    uses_start = {}
+    for s in sections:
+        for start in section_possible_starts[s.id]:
+            uses_start[s.id, start] = model.NewBoolVar(f"uses_start_{s.id}_{start}")
+
+        # exactly one start_block chosen per section
+        vars_ = [uses_start[s.id, start] for start in section_possible_starts[s.id]]
+        if vars_:
+            model.Add(sum(vars_) == 1)
+
+    # link: a session can only be assigned at `start` if that's this
+    # section's chosen fixed start_block
+    for (sid, tid, day, start), v in assign.items():
+        model.Add(v <= uses_start[sid, start])
+
+    # -----------------------------------------------------------------
     # Constraint 1: each section has exactly one teacher
     # -----------------------------------------------------------------
     for s in sections:
@@ -299,6 +329,14 @@ def verify_schedule(result, sections, classes):
                     )
     return conflicts
 
+def verify_same_hour(result, sections, classes):
+    """Checks that every section's sessions all start at the same time."""
+    issues = []
+    for sid, info in result["by_section"].items():
+        start_times = {sess["start_block"] for sess in info["sessions"]}
+        if len(start_times) > 1:
+            issues.append(f"Section {sid} has inconsistent start blocks: {start_times}")
+    return issues
 
 # def diagnose_infeasibility(
 #     sections: list[Section],
