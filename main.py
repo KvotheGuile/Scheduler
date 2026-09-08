@@ -114,6 +114,12 @@ if __name__ == "__main__":
 
     result = generate_schedule(sections, classes, teachers)
     conflicts = verify_schedule(result, sections, classes)
+    classes_same_hour = verify_schedule(result, sections, classes)
+
+    if len(classes_same_hour) > 0:
+        print("CLASSES DIFFERENT HOURS")
+        for issue in classes_same_hour:
+            print(" -", issue)
 
     if conflicts:
         print("SCHEDULE INVALID:")
