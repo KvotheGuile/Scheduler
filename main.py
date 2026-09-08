@@ -2,6 +2,7 @@
 
 from classes import ClassInfo, Section, Teacher 
 from scheduler import generate_schedule, verify_schedule
+from outputSchedule import jsonOutput
 # ---------------------------------------------------------------------------
 # Dummy data (30-minute block grid: block 0 = 7:00am ... block 27 = 8:30pm)
 # ---------------------------------------------------------------------------
@@ -146,5 +147,8 @@ if __name__ == "__main__":
             print(f"{tid}:")
             for e in sorted(entries, key=lambda x: (x["day"], x["start_time"])):
                 print(f"    {day_names[e['day']]} {e['start_time']}-{e['end_time']} -> {e['section']}")
+
+        print()
+        jsonOutput(result["schedule"])
     else:
         print("No feasible schedule found with current constraints.")

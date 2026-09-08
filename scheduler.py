@@ -51,6 +51,44 @@ def valid_start_blocks(teacher:Teacher, day:int, n_blocks:int):
 """
 def period_to_partials(period: int) -> set[int]:
     return  PERIOD_TO_PARTIALS[period]
+    # return (1, 2, 3)
+
+
+def partials_to_periods(partials: set[int]) -> int: 
+    first = 1 in partials
+    second = 2 in partials
+    third = 3 in partials
+
+    if first and second and third:
+        return 6
+    elif second and third:
+        return 5
+    elif first and second:
+        return 4
+    elif third:
+        return 3
+    elif second:
+        return 2
+    elif second:
+        return 1
+    return 7
+
+def days_numbers_2_text(days: list[int]) -> str:
+    r = ""
+
+    if 0 in days:
+        r += "Lu"
+    if 1 in days:
+        r += "Ma"
+    if 2 in days:
+        r += "Mi"
+    if 3 in days:
+        r += "Ju"
+    if 4 in days:
+        r += "Vi"
+
+    return r
+
 
 # ---------------------------------------------------------------------------
 # Scheduler
@@ -273,14 +311,20 @@ def generate_schedule(
     status = solver.Solve(model)
 
     status_name = solver.StatusName(status)
-    result = {"status": status_name, "by_section": {}, "by_teacher": {}}
+    result = {"status": status_name, 
+              "by_section": {}, 
+              "by_teacher": {},
+              "schedule": []}
+
+    full_schedule = {}
 
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         return result
 
     for (sid, tid, day, start), v in assign.items():
         if solver.Value(v):
-            cls = class_lookup[section_lookup[sid].class_id]
+            sct = section_lookup[sid]
+            cls = class_lookup[sct.class_id]
             n_blocks = blocks_needed(cls.duration_minutes)
             end_block = start + n_blocks
             session_info = {
@@ -299,6 +343,22 @@ def generate_schedule(
                 "start_time": block_to_time(start),
                 "end_time": block_to_time(end_block),
             })
+
+            full_schedule.setdefault((sid, tid, start), {})
+            full_schedule[(sid, tid, start)]["carrera"] = sct.major
+            full_schedule[(sid, tid, start)]["semestre"] = sct.semester
+            full_schedule[(sid, tid, start)]["claseId"] = sct.class_id
+            full_schedule[(sid, tid, start)]["profeId"] = tid
+            full_schedule[(sid, tid, start)]["grupo"] = sct.group_number + 100 * partials_to_periods(cls.partials)
+            full_schedule[(sid, tid, start)].setdefault("dias", [])
+            full_schedule[(sid, tid, start)]["dias"].append(day)
+            full_schedule[(sid, tid, start)]["horaInicio"] = block_to_time(start)
+            full_schedule[(sid, tid, start)]["horaFinal"] = block_to_time(end_block)
+            full_schedule[(sid, tid, start)]["salon"]  = "ASSIGNABLE"
+
+    for key in full_schedule:
+        full_schedule[key]["dias"] = days_numbers_2_text(full_schedule[key]["dias"])
+        result["schedule"].append(full_schedule[key])
 
     return result
 
