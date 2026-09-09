@@ -5,3 +5,5 @@ carreras.json
 materias.json
 profesores.json
 output/*.json
+.vscode/
+__pycache__/
