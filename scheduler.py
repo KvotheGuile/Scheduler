@@ -315,34 +315,34 @@ def generate_schedule(
     # -----------------------------------------------------------------
 
     teacher_day_span_terms = []
+    if w_teacher_gaps > 0:
+        for t in teachers:
+            for day in range(NUM_DAYS):
+                day_sessions = [
+                    (start, start + blocks_needed(class_lookup[section_lookup[sid].class_id].duration_minutes), v)
+                    for (sid, tid, d, start), v in assign.items()
+                    if tid == t.id and d == day
+                ]
+                if not day_sessions:
+                    continue
 
-    for t in teachers:
-        for day in range(NUM_DAYS):
-            day_sessions = [
-                (start, start + blocks_needed(class_lookup[section_lookup[sid].class_id].duration_minutes), v)
-                for (sid, tid, d, start), v in assign.items()
-                if tid == t.id and d == day
-            ]
-            if not day_sessions:
-                continue
+                earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"earliest_{t.id}_{day}")
+                latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"latest_{t.id}_{day}")
+                any_session_today = model.NewBoolVar(f"any_{t.id}_{day}")
 
-            earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"earliest_{t.id}_{day}")
-            latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"latest_{t.id}_{day}")
-            any_session_today = model.NewBoolVar(f"any_{t.id}_{day}")
+                session_vars = [v for (_, _, v) in day_sessions]
+                model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
+                model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
 
-            session_vars = [v for (_, _, v) in day_sessions]
-            model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
-            model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
+                for start, end, v in day_sessions:
+                    model.Add(earliest <= start).OnlyEnforceIf(v)
+                    model.Add(latest >= end).OnlyEnforceIf(v)
 
-            for start, end, v in day_sessions:
-                model.Add(earliest <= start).OnlyEnforceIf(v)
-                model.Add(latest >= end).OnlyEnforceIf(v)
+                span = model.NewIntVar(0, BLOCKS_PER_DAY, f"span_{t.id}_{day}")
+                model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
+                model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
 
-            span = model.NewIntVar(0, BLOCKS_PER_DAY, f"span_{t.id}_{day}")
-            model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
-            model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
-
-            teacher_day_span_terms.append(span)
+                teacher_day_span_terms.append(span)
 
     
     # -----------------------------------------------------------------
@@ -350,14 +350,15 @@ def generate_schedule(
     # -----------------------------------------------------------------
 
     teacher_days_used_terms = []
-    for t in teachers:
-        for day in range(NUM_DAYS):
-            used = model.NewBoolVar(f"day_used_{t.id}_{day}")
-            day_vars = [v for (sid, tid, d, start), v in assign.items() if tid == t.id and d == day]
-            if day_vars:
-                model.Add(sum(day_vars) >= 1).OnlyEnforceIf(used)
-                model.Add(sum(day_vars) == 0).OnlyEnforceIf(used.Not())
-                teacher_days_used_terms.append(used)
+    if w_days_used > 0:
+        for t in teachers:
+            for day in range(NUM_DAYS):
+                used = model.NewBoolVar(f"day_used_{t.id}_{day}")
+                day_vars = [v for (sid, tid, d, start), v in assign.items() if tid == t.id and d == day]
+                if day_vars:
+                    model.Add(sum(day_vars) >= 1).OnlyEnforceIf(used)
+                    model.Add(sum(day_vars) == 0).OnlyEnforceIf(used.Not())
+                    teacher_days_used_terms.append(used)
 
     
     # -----------------------------------------------------------------
@@ -390,7 +391,7 @@ def generate_schedule(
     # -----------------------------------------------------------------
 
     undesirable_penalty_terms = []
-    if undesirable_start_blocks is not None:
+    if undesirable_start_blocks is not None and w_undesirable_time > 0:
         for (sid, start), var in uses_start.items():
             if start in undesirable_start_blocks:
                 undesirable_penalty_terms.append(var)
@@ -403,69 +404,71 @@ def generate_schedule(
     group_keys = {(s.major, s.semester, s.group_number) for s in sections}
 
     group_day_span_terms = []
-    for key in group_keys:
-        key_str = "_".join(str(x) for x in key)
-        matching_ids = {s.id for s in sections
-                        if (s.major, s.semester, s.group_number) == key}
+    if w_group_gaps:
+        for key in group_keys:
+            key_str = "_".join(str(x) for x in key)
+            matching_ids = {s.id for s in sections
+                            if (s.major, s.semester, s.group_number) == key}
 
-        for day in range(NUM_DAYS):
-            day_sessions = []
-            for (sid, tid, d, start), v in assign.items():
-                if sid not in matching_ids or d != day:
+            for day in range(NUM_DAYS):
+                day_sessions = []
+                for (sid, tid, d, start), v in assign.items():
+                    if sid not in matching_ids or d != day:
+                        continue
+                    cls = class_lookup[section_lookup[sid].class_id]
+                    n_blocks = blocks_needed(cls.duration_minutes)
+                    day_sessions.append((start, start + n_blocks, v))
+                if not day_sessions:
                     continue
-                cls = class_lookup[section_lookup[sid].class_id]
-                n_blocks = blocks_needed(cls.duration_minutes)
-                day_sessions.append((start, start + n_blocks, v))
-            if not day_sessions:
-                continue
 
-            earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_earliest_{key_str}_{day}")
-            latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_latest_{key_str}_{day}")
-            any_session_today = model.NewBoolVar(f"g_any_{key_str}_{day}")
+                earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_earliest_{key_str}_{day}")
+                latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_latest_{key_str}_{day}")
+                any_session_today = model.NewBoolVar(f"g_any_{key_str}_{day}")
 
-            session_vars = [v for (_, _, v) in day_sessions]
-            model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
-            model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
+                session_vars = [v for (_, _, v) in day_sessions]
+                model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
+                model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
 
-            for start, end, v in day_sessions:
-                model.Add(earliest <= start).OnlyEnforceIf(v)
-                model.Add(latest >= end).OnlyEnforceIf(v)
+                for start, end, v in day_sessions:
+                    model.Add(earliest <= start).OnlyEnforceIf(v)
+                    model.Add(latest >= end).OnlyEnforceIf(v)
 
-            span = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_span_{key_str}_{day}")
-            model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
-            model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
+                span = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_span_{key_str}_{day}")
+                model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
+                model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
 
-            group_day_span_terms.append(span)
+                group_day_span_terms.append(span)
 
     # -----------------------------------------------------------------
     # Optimization 6: Balance days
     # -----------------------------------------------------------------
 
     group_day_balance_terms = []
-    for key in group_keys:
-        key_str = "_".join(str(x) for x in key)
-        matching_ids = {s.id for s in sections
-                        if (s.major, s.semester, s.group_number) == key}
+    if w_group_balance:
+        for key in group_keys:
+            key_str = "_".join(str(x) for x in key)
+            matching_ids = {s.id for s in sections
+                            if (s.major, s.semester, s.group_number) == key}
 
-        day_counts = []
-        for day in range(NUM_DAYS):
-            vars_ = [v for (sid, tid, d, start), v in assign.items()
-                    if sid in matching_ids and d == day]
-            count = model.NewIntVar(0, 20, f"g_count_{key_str}_{day}")
-            if vars_:
-                model.Add(count == sum(vars_))
-            else:
-                model.Add(count == 0)
-            day_counts.append(count)
+            day_counts = []
+            for day in range(NUM_DAYS):
+                vars_ = [v for (sid, tid, d, start), v in assign.items()
+                        if sid in matching_ids and d == day]
+                count = model.NewIntVar(0, 20, f"g_count_{key_str}_{day}")
+                if vars_:
+                    model.Add(count == sum(vars_))
+                else:
+                    model.Add(count == 0)
+                day_counts.append(count)
 
-        max_count = model.NewIntVar(0, 20, f"g_max_{key_str}")
-        min_count = model.NewIntVar(0, 20, f"g_min_{key_str}")
-        model.AddMaxEquality(max_count, day_counts)
-        model.AddMinEquality(min_count, day_counts)
+            max_count = model.NewIntVar(0, 20, f"g_max_{key_str}")
+            min_count = model.NewIntVar(0, 20, f"g_min_{key_str}")
+            model.AddMaxEquality(max_count, day_counts)
+            model.AddMinEquality(min_count, day_counts)
 
-        imbalance = model.NewIntVar(0, 20, f"g_dist_imbalance_{key_str}")
-        model.Add(imbalance == max_count - min_count)
-        group_day_balance_terms.append(imbalance)
+            imbalance = model.NewIntVar(0, 20, f"g_dist_imbalance_{key_str}")
+            model.Add(imbalance == max_count - min_count)
+            group_day_balance_terms.append(imbalance)
 
     # -----------------------------------------------------------------
     # Optimization Weights
