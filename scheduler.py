@@ -397,3 +397,32 @@ def verify_same_hour(result, sections, classes):
         if len(start_times) > 1:
             issues.append(f"Section {sid} has inconsistent start blocks: {start_times}")
     return issues
+
+def verify_group_conflicts(result, sections, classes):
+    """Checks no (mayor, semester, group) has overlapping sessions
+    across different classes."""
+    class_lookup = {c.id: c for c in classes}
+    section_lookup = {s.id: s for s in sections}
+    issues = []
+
+    group_bookings = {}  # (mayor, semester, group) -> list of (day, start, end, section_id)
+    for sid, info in result["by_section"].items():
+        s = section_lookup[sid]
+        key = (s.major, s.semester, s.group_number)
+        cls = class_lookup[s.class_id]
+        n_blocks = blocks_needed(cls.duration_minutes)
+        for sess in info["sessions"]:
+            group_bookings.setdefault(key, []).append(
+                (sess["day"], sess["start_block"], sess["start_block"] + n_blocks, sid)
+            )
+
+    for key, bookings in group_bookings.items():
+        for i in range(len(bookings)):
+            for j in range(i + 1, len(bookings)):
+                d1, s1, e1, sid1 = bookings[i]
+                d2, s2, e2, sid2 = bookings[j]
+                if d1 == d2 and s1 < e2 and s2 < e1:
+                    issues.append(
+                        f"Group {key} double-booked on day {d1}: {sid1} ({s1}-{e1}) overlaps {sid2} ({s2}-{e2})"
+                    )
+    return issues
