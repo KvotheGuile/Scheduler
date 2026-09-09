@@ -47,7 +47,7 @@ teachers = [
         id="L0613",
         name="Luis",
         can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
         max_load_per_partial=4.0,
         max_load_total=10.0,
     ),
@@ -55,7 +55,7 @@ teachers = [
         id="L0999",
         name="Samatha",
         can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
         max_load_per_partial=4.0,
         max_load_total=10.0,
     ),
@@ -63,7 +63,7 @@ teachers = [
         id="L0456",
         name="Leonor",
         can_teach={"ALGORITHMS", "CALC1", "M0404", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
         max_load_per_partial=2,
         max_load_total=2,
     ),
@@ -72,15 +72,34 @@ teachers = [
 # --- Sections --------------------------------------------------------------
 sections = [
     Section(id="A1", major="SE", semester=3, class_id="M0125", group_number=1, partials={1, 2}),
-    #Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2, 3}),
+    Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2, 3}),
     Section(id="B1", major="SE", semester=3, class_id="B0361", group_number=1, partials={1, 2}),
-    #Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2, 3}),
+    Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2, 3}),
     Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3})
 ]
 
 if __name__ == "__main__":
 
-    result = generate_schedule(sections, classes, teachers)
+    # ---------------
+    # Running Model 
+    # ---------------
+    result = generate_schedule(
+        sections, 
+        classes, 
+        teachers,
+        w_group_balance=5,
+        w_group_gaps=15,
+        w_days_used=2,
+        w_teacher_gaps=8,
+        w_teacher_load_imbalance=1,
+        w_undesirable_time=10,
+        undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
+        max_time_in_seconds=180.0
+        )
+
+    # ---------------
+    # Issues 
+    # ---------------
     issues = [] 
     issues.extend(verify_schedule(result, sections, classes))
     issues.extend(verify_group_conflicts(result, sections, classes))
@@ -93,6 +112,10 @@ if __name__ == "__main__":
     else:
         print("Schedule verified clean.")
 
+    
+    # ---------------
+    # Printed Output
+    # ---------------
     print("\nStatus:", result["status"])
     print()
 
