@@ -1,4 +1,5 @@
 
+import time
 from classes import ClassInfo, Section, Teacher 
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour
 from outputSchedule import jsonOutput
@@ -23,7 +24,7 @@ classes = [
     ClassInfo(id="PE",         duration_minutes= 90, sessions_per_week=1, partials={2},       load=1.0, name="Pheasant Eagle"),
     ClassInfo(id="M0125",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Math"),
     ClassInfo(id="B0361",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Physics"),
-    ClassInfo(id="M0404",      duration_minutes=120, sessions_per_week=5, partials={3},    load=1,   name="Physics")
+    ClassInfo(id="M0404",      duration_minutes=120, sessions_per_week=5, partials={3},    load=1,   name="Chem")
 ]
 
 # --- Teachers ------------------------------------------------------------
@@ -71,10 +72,11 @@ teachers = [
 # --- Sections --------------------------------------------------------------
 sections = [
     Section(id="A1", major="SE", semester=3, class_id="M0125", group_number=1, partials={1, 2}),
-    Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2, 3}),
+    Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2}),
     Section(id="B1", major="SE", semester=3, class_id="B0361", group_number=1, partials={1, 2}),
-    Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2, 3}),
-    Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3})
+    Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2}),
+    Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3}),
+    Section(id="C2", major="SE", semester=3, class_id="M0404", group_number=2, partials={3})
 ]
 
 classrooms = [
@@ -83,6 +85,12 @@ classrooms = [
 ]
 
 if __name__ == "__main__":
+
+
+    start_time = time.perf_counter()
+    result_time = 0
+    verification_time = 0
+    end_time = 0
 
     # ---------------
     # Running Model 
@@ -99,8 +107,10 @@ if __name__ == "__main__":
         w_teacher_load_imbalance=1,
         w_undesirable_time=10,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=30.0
+        max_time_in_seconds=6000.0
         )
+
+    result_time = time.perf_counter()
 
     # ---------------
     # Issues 
@@ -109,6 +119,8 @@ if __name__ == "__main__":
     issues.extend(verify_schedule(result, sections, classes))
     issues.extend(verify_group_conflicts(result, sections, classes))
     issues.extend(verify_same_hour(result, sections, classes))
+
+    verification_time = time.perf_counter()
 
     if issues:
         print("SCHEDULE INVALID:")
@@ -144,3 +156,11 @@ if __name__ == "__main__":
         jsonOutput(result["schedule"])
     else:
         print("No feasible schedule found with current constraints.")
+
+    end_time = time.perf_counter()
+
+    print(f"\nScheduler run time: {int(result_time - start_time)}s")
+    print(f"Verification run time: {int(verification_time - result_time)}s")
+    print(f"Output run time: {int(end_time - verification_time)}s")
+    print(f"Total run time: {int(end_time - start_time)}s")
+    
