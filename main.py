@@ -1,7 +1,7 @@
 
 
 from classes import ClassInfo, Section, Teacher 
-from scheduler import generate_schedule, verify_schedule
+from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour
 from outputSchedule import jsonOutput
 
 
@@ -16,12 +16,15 @@ def time_range_to_blocks(start_hour, start_min, end_hour, end_min):
 
 # --- Classes -----------------------------------------------------------
 classes = [
-    ClassInfo(id="DATABASES",  duration_minutes=120, sessions_per_week=4, partials={2, 3}, load=3.0,  name="Databases Engineering"),
-    ClassInfo(id="ALGORITHMS", duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=3.0,  name="Algorithms and Data Structures"),
-    ClassInfo(id="ETHICS",     duration_minutes=90,  sessions_per_week=2, partials={1},        load=2.0, name="Ethics"),
-    ClassInfo(id="WEBDEV",     duration_minutes=90,  sessions_per_week=2, partials={2, 3},     load=2.0, name="Web Development"),
-    ClassInfo(id="CALC1",      duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=4.0,  name="Calculus I"),
-    ClassInfo(id="PE",         duration_minutes=90,  sessions_per_week=1, partials={2},        load=1.0, name="Pheasant Eagle"),
+    ClassInfo(id="DATABASES",  duration_minutes=120, sessions_per_week=4, partials={2, 3},    load=3.0, name="Databases Engineering"),
+    ClassInfo(id="ALGORITHMS", duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=3.0, name="Algorithms and Data Structures"),
+    ClassInfo(id="ETHICS",     duration_minutes= 90, sessions_per_week=2, partials={1},       load=2.0, name="Ethics"),
+    ClassInfo(id="WEBDEV",     duration_minutes= 90, sessions_per_week=2, partials={2, 3},    load=2.0, name="Web Development"),
+    ClassInfo(id="CALC1",      duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=4.0, name="Calculus I"),
+    ClassInfo(id="PE",         duration_minutes= 90, sessions_per_week=1, partials={2},       load=1.0, name="Pheasant Eagle"),
+    ClassInfo(id="M0125",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Math"),
+    ClassInfo(id="B0361",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Physics"),
+    ClassInfo(id="M0404",      duration_minutes=120, sessions_per_week=5, partials={3},    load=1,   name="Physics")
 ]
 
 # --- Teachers ------------------------------------------------------------
@@ -33,80 +36,60 @@ def daily_availability(days, start_h, start_m, end_h, end_m):
 
 teachers = [
     Teacher(
-        id="T1_ana",
+        id="L0125",
         name="Ana",
-        can_teach={"DATABASES", "ALGORITHMS", "WEBDEV"},
-        availability=daily_availability([0, 1, 2, 3], 8, 0, 14, 0),
+        can_teach={"DATABASES", "ALGORITHMS", "WEBDEV", "M0125", "B0361"},
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
         max_load_per_partial=6.0,
         max_load_total=15.0,
     ),
     Teacher(
-        id="T2_luis",
+        id="L0613",
         name="Luis",
-        can_teach={"ALGORITHMS", "CALC1"},
+        can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
         availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
         max_load_per_partial=4.0,
         max_load_total=10.0,
     ),
     Teacher(
-        id="T3_maria",
-        name="Maria",
-        can_teach={"ETHICS", "WEBDEV", "PE"},
-        availability=(
-            daily_availability([0, 2, 4], 9, 0, 13, 0)
-            + daily_availability([0, 2, 4], 17, 0, 19, 0)
-        ),
-        max_load_per_partial=5.0,
-        max_load_total=12.0,
-    ),
-    Teacher(
-        id="T4_carlos",
-        name="Carlos",
-        can_teach={"DATABASES", "CALC1", "PE"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 20, 0),
-        max_load_per_partial=8.0,
-        max_load_total=30.0,
-    ),
-    Teacher(
-        id="T5_samantha",
-        name="Samantha",
-        can_teach={"DATABASES", "CALC1", "PE", "WEBDEV"},
+        id="L0999",
+        name="Samatha",
+        can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
         availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
-        max_load_per_partial=12.0,
-        max_load_total=30.0,
+        max_load_per_partial=4.0,
+        max_load_total=10.0,
+    ),
+    Teacher(
+        id="L0456",
+        name="Leonor",
+        can_teach={"ALGORITHMS", "CALC1", "M0404", "M0125", "B0361"},
+        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
+        max_load_per_partial=2,
+        max_load_total=2,
     ),
 ]
 
 # --- Sections --------------------------------------------------------------
 sections = [
-    Section(id="SE-3-DATABASES-g1", major="SE", semester=3, class_id="DATABASES", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-3-DATABASES-g2", major="SE", semester=3, class_id="DATABASES", group_number=2, partials={1, 2, 3}),
-    Section(id="SE-3-ALGORITHMS-g1", major="SE", semester=3, class_id="ALGORITHMS", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-3-ETHICS-g1", major="SE", semester=3, class_id="ETHICS", group_number=1, partials={1}),
-
-    Section(id="SE-1-CALC1-g1", major="SE", semester=1, class_id="CALC1", group_number=1, partials={1, 2, 3}),
-    Section(id="SE-1-WEBDEV-g1", major="SE", semester=1, class_id="WEBDEV", group_number=1, partials={2, 3}),
-    Section(id="SE-1-PE-g1", major="SE", semester=1, class_id="PE", group_number=1, partials={2}),
-
-    Section(id="BA-2-ETHICS-g1", major="BA", semester=2, class_id="ETHICS", group_number=1, partials={1}),
-    Section(id="BA-2-CALC1-g1", major="BA", semester=2, class_id="CALC1", group_number=1, partials={1, 2, 3}),
+    Section(id="A1", major="SE", semester=3, class_id="M0125", group_number=1, partials={1, 2}),
+    #Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2, 3}),
+    Section(id="B1", major="SE", semester=3, class_id="B0361", group_number=1, partials={1, 2}),
+    #Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2, 3}),
+    Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3})
 ]
 
 if __name__ == "__main__":
 
     result = generate_schedule(sections, classes, teachers)
-    conflicts = verify_schedule(result, sections, classes)
-    classes_same_hour = verify_schedule(result, sections, classes)
+    issues = [] 
+    issues.extend(verify_schedule(result, sections, classes))
+    issues.extend(verify_group_conflicts(result, sections, classes))
+    issues.extend(verify_same_hour(result, sections, classes))
 
-    if len(classes_same_hour) > 0:
-        print("CLASSES DIFFERENT HOURS")
-        for issue in classes_same_hour:
-            print(" -", issue)
-
-    if conflicts:
+    if issues:
         print("SCHEDULE INVALID:")
-        for c in conflicts:
-            print(" -", c)
+        for i in issues:
+            print(" -", i)
     else:
         print("Schedule verified clean.")
 
