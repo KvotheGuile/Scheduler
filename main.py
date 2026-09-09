@@ -1,5 +1,4 @@
 
-
 from classes import ClassInfo, Section, Teacher 
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour
 from outputSchedule import jsonOutput
@@ -78,6 +77,11 @@ sections = [
     Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3})
 ]
 
+classrooms = [
+    "PEI 301",
+    "PEI 302"
+]
+
 if __name__ == "__main__":
 
     # ---------------
@@ -87,14 +91,15 @@ if __name__ == "__main__":
         sections, 
         classes, 
         teachers,
+        classrooms,
         w_group_balance=5,
         w_group_gaps=15,
-        w_days_used=2,
+        w_days_used=0,
         w_teacher_gaps=8,
         w_teacher_load_imbalance=1,
         w_undesirable_time=10,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=180.0
+        max_time_in_seconds=30.0
         )
 
     # ---------------

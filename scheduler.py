@@ -98,6 +98,7 @@ def generate_schedule(
     sections: list[Section],
     classes: list[ClassInfo],
     teachers: list[Teacher],
+    classrooms: list[str],
     all_partials: tuple[int, ...] = (1, 2, 3),
     load_scale: int = 100,
     max_time_in_seconds: float = 180.0,
@@ -107,6 +108,7 @@ def generate_schedule(
     w_undesirable_time=3,
     w_group_gaps=10,
     w_group_balance=8,
+    w_group_room=20,
     undesirable_start_blocks: set = None,
 ):
     """
@@ -163,8 +165,14 @@ def generate_schedule(
                         f"assign_{s.id}_{t.id}_{day}_{start}"
                     )
 
+    NUM_CLASSROOMS = len(classrooms)
+
+    room_id = {}
+    for s in sections:
+        room_id[s.id] = model.NewIntVar(0, NUM_CLASSROOMS - 1, f"room_{s.id}")
+
     # -----------------------------------------------------------------
-    # Constraint: same class must occur at the same start_block every day
+    # Constraint 1: same class must occur at the same start_block every day
     # it meets (e.g. always 10:00am on whichever days it runs).
     # -----------------------------------------------------------------
 
@@ -194,14 +202,14 @@ def generate_schedule(
         model.Add(v <= uses_start[sid, start])
 
     # -----------------------------------------------------------------
-    # Constraint 1: each section has exactly one teacher
+    # Constraint 2: each section has exactly one teacher
     # -----------------------------------------------------------------
     for s in sections:
         vars_ = [v for (sid, tid), v in teaches.items() if sid == s.id]
         model.Add(sum(vars_) == 1)
 
     # -----------------------------------------------------------------
-    # Constraint 2: assign implies teaches; each section gets exactly
+    # Constraint 3: assign implies teaches; each section gets exactly
     # sessions_per_week distinct (day, start) sessions with its teacher.
     # Also: no two sessions of the SAME section on the same day
     # (adjust here if your school allows double sessions same day).
@@ -227,7 +235,7 @@ def generate_schedule(
                 model.Add(sum(day_vars) <= 1)
 
     # -----------------------------------------------------------------
-    # Constraint 3: no teacher double-booked (interval-based, robust),
+    # Constraint 4: no teacher double-booked (interval-based, robust),
     # scoped by partial -- sessions in non-overlapping partials never
     # compete for the same teacher slot.
     # -----------------------------------------------------------------
@@ -251,7 +259,7 @@ def generate_schedule(
                 model.AddNoOverlap(intervals)
 
     # -----------------------------------------------------------------
-    # Constraint 4: no student group double-booked (interval-based),
+    # Constraint 5: no student group double-booked (interval-based),
     # scoped by partial. Grouped by (major, semester, group_number).
     # -----------------------------------------------------------------
     group_keys = {(s.major, s.semester, s.group_number) for s in sections}
@@ -277,7 +285,7 @@ def generate_schedule(
                 model.AddNoOverlap(intervals)
 
     # -----------------------------------------------------------------
-    # Constraint 5: teacher per-partial load cap
+    # Constraint 6: teacher per-partial load cap
     # -----------------------------------------------------------------
     for t in teachers:
         for p in all_partials:
@@ -295,7 +303,7 @@ def generate_schedule(
                 model.Add(sum(vars_) <= bound)
 
     # -----------------------------------------------------------------
-    # Constraint 6: teacher total semester load cap
+    # Constraint 7: teacher total semester load cap
     # -----------------------------------------------------------------
     for t in teachers:
         vars_ = []
@@ -308,8 +316,35 @@ def generate_schedule(
         if vars_:
             bound = int(round(t.max_load_total * load_scale))
             model.Add(sum(vars_) <= bound)
-
     
+    # -----------------------------------------------------------------
+    # Constraint 8: No double-booked classrooms
+    # -----------------------------------------------------------------
+    for p in all_partials:
+        time_intervals = []
+        room_intervals = []
+        for (sid, tid, day, start), v in assign.items():
+            if p not in section_lookup[sid].partials:
+                continue
+            cls = class_lookup[section_lookup[sid].class_id]
+            n_blocks = blocks_needed(cls.duration_minutes)
+            global_start = day * BLOCKS_PER_DAY + start
+
+            t_ivl = model.NewOptionalIntervalVar(
+                global_start, n_blocks, global_start + n_blocks, v,
+                f"room_time_{sid}_{tid}_{day}_{start}_{p}"
+            )
+            r_ivl = model.NewOptionalIntervalVar(
+                room_id[sid], 1, room_id[sid] + 1, v,
+                f"room_dim_{sid}_{tid}_{day}_{start}_{p}"
+            )
+            time_intervals.append(t_ivl)
+            room_intervals.append(r_ivl)
+
+        if time_intervals:
+            model.AddNoOverlap2D(time_intervals, room_intervals)
+
+
     # -----------------------------------------------------------------
     # Optimization 1: Minimize the "span" between first and last class.
     # -----------------------------------------------------------------
@@ -470,6 +505,24 @@ def generate_schedule(
             model.Add(imbalance == max_count - min_count)
             group_day_balance_terms.append(imbalance)
 
+    
+    # -----------------------------------------------------------------
+    # Optimization 7: All classes of a group in same room
+    # -----------------------------------------------------------------
+
+    group_room_penalty_terms = []
+    if w_group_room:
+        for key in group_keys:
+            matching_ids = [s.id for s in sections
+                            if (s.major, s.semester, s.group_number) == key]
+            for i in range(len(matching_ids)):
+                for j in range(i + 1, len(matching_ids)):
+                    sid1, sid2 = matching_ids[i], matching_ids[j]
+                    diff = model.NewBoolVar(f"room_diff_{sid1}_{sid2}")
+                    model.Add(room_id[sid1] != room_id[sid2]).OnlyEnforceIf(diff)
+                    model.Add(room_id[sid1] == room_id[sid2]).OnlyEnforceIf(diff.Not())
+                    group_room_penalty_terms.append(diff)
+
     # -----------------------------------------------------------------
     # Optimization Weights
     # -----------------------------------------------------------------
@@ -482,6 +535,7 @@ def generate_schedule(
     objective_terms += [w_undesirable_time * v for v in undesirable_penalty_terms]
     objective_terms += [w_group_gaps * v for v in group_day_span_terms]
     objective_terms += [w_group_balance * v for v in group_day_balance_terms]
+    objective_terms += [w_group_room * v for v in group_room_penalty_terms]
 
     if objective_terms:
         model.Minimize(sum(objective_terms))
@@ -538,7 +592,7 @@ def generate_schedule(
             full_schedule[(sid, tid, start)]["dias"].append(day)
             full_schedule[(sid, tid, start)]["horaInicio"] = block_to_time(start)
             full_schedule[(sid, tid, start)]["horaFinal"] = block_to_time(end_block)
-            full_schedule[(sid, tid, start)]["salon"]  = "ASSIGNABLE"
+            full_schedule[(sid, tid, start)]["salon"]  = classrooms[solver.Value(room_id[sid])]
 
     for key in full_schedule:
         full_schedule[key]["dias"] = days_numbers_2_text(full_schedule[key]["dias"])
