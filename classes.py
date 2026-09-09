@@ -16,7 +16,7 @@ class ClassInfo:
     name: str
     partials: set[int]      # e.g. {1}, {2,3}, {1,2,3}
     load: float            
-    sessions_per_week: int  # e.g. 3 sessions of 90 min, or 2 sessions of 120 min
+    sessions_per_week: int 
     duration_minutes: int   # e.g. 120 or 90
 
 @dataclass
