@@ -100,11 +100,13 @@ def generate_schedule(
     teachers: list[Teacher],
     all_partials: tuple[int, ...] = (1, 2, 3),
     load_scale: int = 100,
-    max_time_in_seconds: float = 60.0,
-    w_gaps: int = 10,
-    w_days_used: int = 5,
-    w_load_imbalance: int = 8,
-    w_undesirable_time: int = 3,
+    max_time_in_seconds: float = 180.0,
+    w_teacher_gaps=10,
+    w_days_used=5,
+    w_teacher_load_imbalance=8,
+    w_undesirable_time=3,
+    w_group_gaps=10,
+    w_group_balance=8,
     undesirable_start_blocks: set = None,
 ):
     """
@@ -395,15 +397,88 @@ def generate_schedule(
 
 
     # -----------------------------------------------------------------
+    # Optimization 5: Avoid gaps on students's classes
+    # -----------------------------------------------------------------
+
+    group_keys = {(s.major, s.semester, s.group_number) for s in sections}
+
+    group_day_span_terms = []
+    for key in group_keys:
+        key_str = "_".join(str(x) for x in key)
+        matching_ids = {s.id for s in sections
+                        if (s.major, s.semester, s.group_number) == key}
+
+        for day in range(NUM_DAYS):
+            day_sessions = []
+            for (sid, tid, d, start), v in assign.items():
+                if sid not in matching_ids or d != day:
+                    continue
+                cls = class_lookup[section_lookup[sid].class_id]
+                n_blocks = blocks_needed(cls.duration_minutes)
+                day_sessions.append((start, start + n_blocks, v))
+            if not day_sessions:
+                continue
+
+            earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_earliest_{key_str}_{day}")
+            latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_latest_{key_str}_{day}")
+            any_session_today = model.NewBoolVar(f"g_any_{key_str}_{day}")
+
+            session_vars = [v for (_, _, v) in day_sessions]
+            model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
+            model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
+
+            for start, end, v in day_sessions:
+                model.Add(earliest <= start).OnlyEnforceIf(v)
+                model.Add(latest >= end).OnlyEnforceIf(v)
+
+            span = model.NewIntVar(0, BLOCKS_PER_DAY, f"g_span_{key_str}_{day}")
+            model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
+            model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
+
+            group_day_span_terms.append(span)
+
+    # -----------------------------------------------------------------
+    # Optimization 6: Balance days
+    # -----------------------------------------------------------------
+
+    group_day_balance_terms = []
+    for key in group_keys:
+        key_str = "_".join(str(x) for x in key)
+        matching_ids = {s.id for s in sections
+                        if (s.major, s.semester, s.group_number) == key}
+
+        day_counts = []
+        for day in range(NUM_DAYS):
+            vars_ = [v for (sid, tid, d, start), v in assign.items()
+                    if sid in matching_ids and d == day]
+            count = model.NewIntVar(0, 20, f"g_count_{key_str}_{day}")
+            if vars_:
+                model.Add(count == sum(vars_))
+            else:
+                model.Add(count == 0)
+            day_counts.append(count)
+
+        max_count = model.NewIntVar(0, 20, f"g_max_{key_str}")
+        min_count = model.NewIntVar(0, 20, f"g_min_{key_str}")
+        model.AddMaxEquality(max_count, day_counts)
+        model.AddMinEquality(min_count, day_counts)
+
+        imbalance = model.NewIntVar(0, 20, f"g_dist_imbalance_{key_str}")
+        model.Add(imbalance == max_count - min_count)
+        group_day_balance_terms.append(imbalance)
+
+    # -----------------------------------------------------------------
     # Optimization Weights
     # -----------------------------------------------------------------
     
     objective_terms = []
 
-    objective_terms += [w_gaps * v for v in teacher_day_span_terms]
+    objective_terms += [w_teacher_gaps * v for v in teacher_day_span_terms]
     objective_terms += [w_days_used * v for v in teacher_days_used_terms]
-    objective_terms.append(w_load_imbalance * load_imbalance)
+    objective_terms.append(w_teacher_load_imbalance * load_imbalance)
     objective_terms += [w_undesirable_time * v for v in undesirable_penalty_terms]
+    objective_terms += [w_group_gaps * v for v in group_day_span_terms]
+    objective_terms += [w_group_balance * v for v in group_day_balance_terms]
 
     if objective_terms:
         model.Minimize(sum(objective_terms))
@@ -505,13 +580,13 @@ def verify_same_hour(result, sections, classes):
     return issues
 
 def verify_group_conflicts(result, sections, classes):
-    """Checks no (mayor, semester, group) has overlapping sessions
+    """Checks no (major, semester, group) has overlapping sessions
     across different classes, during partials where they both run."""
     class_lookup = {c.id: c for c in classes}
     section_lookup = {s.id: s for s in sections}
     issues = []
 
-    group_bookings = {}  # (mayor, semester, group) -> list of (day, start, end, section_id)
+    group_bookings = {}  # (major, semester, group) -> list of (day, start, end, section_id)
     for sid, info in result["by_section"].items():
         s = section_lookup[sid]
         key = (s.major, s.semester, s.group_number)
