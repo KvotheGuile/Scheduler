@@ -101,6 +101,11 @@ def generate_schedule(
     all_partials: tuple[int, ...] = (1, 2, 3),
     load_scale: int = 100,
     max_time_in_seconds: float = 60.0,
+    w_gaps: int = 10,
+    w_days_used: int = 5,
+    w_load_imbalance: int = 8,
+    w_undesirable_time: int = 3,
+    undesirable_start_blocks: set = None,
 ):
     """
     Returns:
@@ -302,6 +307,107 @@ def generate_schedule(
             bound = int(round(t.max_load_total * load_scale))
             model.Add(sum(vars_) <= bound)
 
+    
+    # -----------------------------------------------------------------
+    # Optimization 1: Minimize the "span" between first and last class.
+    # -----------------------------------------------------------------
+
+    teacher_day_span_terms = []
+
+    for t in teachers:
+        for day in range(NUM_DAYS):
+            day_sessions = [
+                (start, start + blocks_needed(class_lookup[section_lookup[sid].class_id].duration_minutes), v)
+                for (sid, tid, d, start), v in assign.items()
+                if tid == t.id and d == day
+            ]
+            if not day_sessions:
+                continue
+
+            earliest = model.NewIntVar(0, BLOCKS_PER_DAY, f"earliest_{t.id}_{day}")
+            latest = model.NewIntVar(0, BLOCKS_PER_DAY, f"latest_{t.id}_{day}")
+            any_session_today = model.NewBoolVar(f"any_{t.id}_{day}")
+
+            session_vars = [v for (_, _, v) in day_sessions]
+            model.Add(sum(session_vars) >= 1).OnlyEnforceIf(any_session_today)
+            model.Add(sum(session_vars) == 0).OnlyEnforceIf(any_session_today.Not())
+
+            for start, end, v in day_sessions:
+                model.Add(earliest <= start).OnlyEnforceIf(v)
+                model.Add(latest >= end).OnlyEnforceIf(v)
+
+            span = model.NewIntVar(0, BLOCKS_PER_DAY, f"span_{t.id}_{day}")
+            model.Add(span == latest - earliest).OnlyEnforceIf(any_session_today)
+            model.Add(span == 0).OnlyEnforceIf(any_session_today.Not())
+
+            teacher_day_span_terms.append(span)
+
+    
+    # -----------------------------------------------------------------
+    # Optimization 2: Minimize the amount of days teacher have classes.
+    # -----------------------------------------------------------------
+
+    teacher_days_used_terms = []
+    for t in teachers:
+        for day in range(NUM_DAYS):
+            used = model.NewBoolVar(f"day_used_{t.id}_{day}")
+            day_vars = [v for (sid, tid, d, start), v in assign.items() if tid == t.id and d == day]
+            if day_vars:
+                model.Add(sum(day_vars) >= 1).OnlyEnforceIf(used)
+                model.Add(sum(day_vars) == 0).OnlyEnforceIf(used.Not())
+                teacher_days_used_terms.append(used)
+
+    
+    # -----------------------------------------------------------------
+    # Optimization 3: Equalize's teacher load
+    # -----------------------------------------------------------------
+
+    teacher_load_vars = []
+    for t in teachers:
+        load_terms = []
+        for s in sections:
+            key = (s.id, t.id)
+            if key in teaches:
+                cls = class_lookup[s.class_id]
+                coeff = int(round(cls.load * len(s.partials) * load_scale))
+                load_terms.append(coeff * teaches[key])
+        total = model.NewIntVar(0, 100000, f"total_load_{t.id}")
+        model.Add(total == sum(load_terms)) if load_terms else model.Add(total == 0)
+        teacher_load_vars.append(total)
+
+    max_load = model.NewIntVar(0, 100000, "max_load")
+    min_load = model.NewIntVar(0, 100000, "min_load")
+    model.AddMaxEquality(max_load, teacher_load_vars)
+    model.AddMinEquality(min_load, teacher_load_vars)
+    load_imbalance = model.NewIntVar(0, 100000, "load_imbalance")
+    model.Add(load_imbalance == max_load - min_load)
+
+    
+    # -----------------------------------------------------------------
+    # Optimization 4: Undesirable hours
+    # -----------------------------------------------------------------
+
+    undesirable_penalty_terms = []
+    if undesirable_start_blocks is not None:
+        for (sid, start), var in uses_start.items():
+            if start in undesirable_start_blocks:
+                undesirable_penalty_terms.append(var)
+
+
+    # -----------------------------------------------------------------
+    # Optimization Weights
+    # -----------------------------------------------------------------
+    
+    objective_terms = []
+
+    objective_terms += [w_gaps * v for v in teacher_day_span_terms]
+    objective_terms += [w_days_used * v for v in teacher_days_used_terms]
+    objective_terms.append(w_load_imbalance * load_imbalance)
+    objective_terms += [w_undesirable_time * v for v in undesirable_penalty_terms]
+
+    if objective_terms:
+        model.Minimize(sum(objective_terms))
+
     # -----------------------------------------------------------------
     # Solve
     # -----------------------------------------------------------------
@@ -422,6 +528,8 @@ def verify_group_conflicts(result, sections, classes):
                 d1, s1, e1, sid1 = bookings[i]
                 d2, s2, e2, sid2 = bookings[j]
                 if d1 == d2 and s1 < e2 and s2 < e1:
+                    print("i:\n",bookings[i])
+                    print("j:\n",bookings[j])
                     issues.append(
                         f"Group {key} double-booked on day {d1}: {sid1} ({s1}-{e1}) overlaps {sid2} ({s2}-{e2})"
                     )
