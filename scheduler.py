@@ -546,7 +546,10 @@ def generate_schedule(
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = max_time_in_seconds
     solver.parameters.num_search_workers = 8
+    solver.parameters.log_search_progress = True  # prints search stats live
     status = solver.Solve(model)
+
+    print(solver.ResponseStats())
 
     status_name = solver.StatusName(status)
     result = {"status": status_name, 
