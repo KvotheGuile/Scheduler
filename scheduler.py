@@ -506,7 +506,7 @@ def verify_same_hour(result, sections, classes):
 
 def verify_group_conflicts(result, sections, classes):
     """Checks no (mayor, semester, group) has overlapping sessions
-    across different classes."""
+    across different classes, during partials where they both run."""
     class_lookup = {c.id: c for c in classes}
     section_lookup = {s.id: s for s in sections}
     issues = []
@@ -527,10 +527,20 @@ def verify_group_conflicts(result, sections, classes):
             for j in range(i + 1, len(bookings)):
                 d1, s1, e1, sid1 = bookings[i]
                 d2, s2, e2, sid2 = bookings[j]
-                if d1 == d2 and s1 < e2 and s2 < e1:
-                    print("i:\n",bookings[i])
-                    print("j:\n",bookings[j])
-                    issues.append(
-                        f"Group {key} double-booked on day {d1}: {sid1} ({s1}-{e1}) overlaps {sid2} ({s2}-{e2})"
-                    )
+
+                # Day & Time overlap check
+                if d1 != d2 or not (s1 < e2 and s2 < e1):
+                    continue
+
+                # Only a real conflict if the two sections share at least on partial
+                partials1 = section_lookup[sid1].partials
+                partials2 = section_lookup[sid2].partials
+                if partials1.isdisjoint(partials2):
+                    continue  # different partials
+
+                issues.append(
+                    f"Group {key} double-booked on day {d1}: {sid1} ({s1}-{e1}, partials={partials1}) "
+                    f"overlaps {sid2} ({s2}-{e2}, partials={partials2})"
+                )
+
     return issues
