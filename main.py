@@ -1,6 +1,7 @@
 
 import time
 from classes import ClassInfo, Section, Teacher 
+from readFile import getClassesInfo, getRooms, getSections, getTeachers
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour, pre_solve_sanity_checks, diagnose_infeasibility
 from outputSchedule import jsonOutput
 
@@ -85,7 +86,7 @@ classrooms = [
     "PEI 302"
 ]
 
-for i in range(25):
+for i in range(5):
     sections.append(Section(id=f"E{i + 1}", major="SE", semester=5, class_id="B0361", group_number=i + 1, partials={1, 2}))
     if i % 2 == 0:
         teachers.append(Teacher(id=f"L037{i}", name=f"Teacher-{i + 1}", can_teach={"B0361"}, 
@@ -99,12 +100,24 @@ for i in range(25):
 if __name__ == "__main__":
 
 
+    # ---------------
+    # Time checks
+    # ---------------
+
     start_time = time.perf_counter()
     pre_check_time = 0
     result_time = 0
     verification_time = 0
     end_time = 0
 
+    # ---------------
+    # Reading files
+    # ---------------
+    teachers = getTeachers("input/profesores.json")
+    classes = getClassesInfo("input/materias.json")
+    sections = getSections("input/carreras.json")
+    classes = [ (f"{room.building} {room.id}") for room in getRooms("input/aulas.json")]    
+    
     # ---------------
     # Pre-verify Model
     # ---------------
@@ -118,7 +131,7 @@ if __name__ == "__main__":
         raise ValueError
     else:
         print("Pre-solve check passed")
-        diagnose_infeasibility(sections, classes, teachers)
+        # diagnose_infeasibility(sections, classes, teachers)
         
 
     pre_check_time = time.perf_counter()

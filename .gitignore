@@ -7,3 +7,4 @@ profesores.json
 output/*.json
 .vscode/
 __pycache__/
+ignore/
