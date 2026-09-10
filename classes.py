@@ -22,8 +22,4 @@ class ClassInfo:
 @dataclass
 class Teacher:
     id: str
-    name: str
-    can_teach: list[str]
-    max_load_per_partial: float
-    max_load_total: float
-    availability: list[tuple]  
+    building: str
