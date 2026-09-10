@@ -116,8 +116,8 @@ if __name__ == "__main__":
     teachers = getTeachers("input/profesores.json")
     classes = getClassesInfo("input/materias.json")
     sections = getSections("input/carreras.json")
-    classes = [ (f"{room.building} {room.id}") for room in getRooms("input/aulas.json")]    
-    
+    classrooms = [ (f"{room.building} {room.id}") for room in getRooms("input/aulas.json")]    
+
     # ---------------
     # Pre-verify Model
     # ---------------
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         raise ValueError
     else:
         print("Pre-solve check passed")
-        # diagnose_infeasibility(sections, classes, teachers)
+        diagnose_infeasibility(sections, classes, teachers)
         
 
     pre_check_time = time.perf_counter()
@@ -147,11 +147,11 @@ if __name__ == "__main__":
         w_group_balance=5,
         w_group_gaps=15,
         w_days_used=0,
-        w_teacher_gaps=8,
-        w_teacher_load_imbalance=1,
-        w_undesirable_time=10,
+        w_teacher_gaps=9,
+        w_teacher_load_imbalance=3,
+        w_undesirable_time=20,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=180.0,
+        max_time_in_seconds=3000.0,
         relative_gap_limit=0.1
         )
 
