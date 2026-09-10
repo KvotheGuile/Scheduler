@@ -1,7 +1,7 @@
 
 import time
 from classes import ClassInfo, Section, Teacher 
-from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour
+from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour, pre_solve_sanity_checks, diagnose_infeasibility
 from outputSchedule import jsonOutput
 
 
@@ -85,24 +85,43 @@ classrooms = [
     "PEI 302"
 ]
 
-for i in range(100):
+for i in range(25):
     sections.append(Section(id=f"E{i + 1}", major="SE", semester=5, class_id="B0361", group_number=i + 1, partials={1, 2}))
     if i % 2 == 0:
-        teachers.append(Teacher(id="L037{i}", name=f"Teacher-{i + 1}", can_teach={"B0361"}, 
+        teachers.append(Teacher(id=f"L037{i}", name=f"Teacher-{i + 1}", can_teach={"B0361"}, 
                                 availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0), 
-                                max_load_per_partial=14,
-                                max_load_total=14
+                                max_load_per_partial=15,
+                                max_load_total=15
                                 ))
-    if i % 3 == 0:
+    if i % 2 == 0:
         classrooms.append(f"KNEE 40{(i//3)+1}")
 
 if __name__ == "__main__":
 
 
     start_time = time.perf_counter()
+    pre_check_time = 0
     result_time = 0
     verification_time = 0
     end_time = 0
+
+    # ---------------
+    # Pre-verify Model
+    # ---------------
+
+    pre_issues = []
+    pre_issues = pre_solve_sanity_checks(sections, classes, teachers, len(classrooms))
+    if pre_issues:
+        print("Pre Solve check:")
+        for i in pre_issues:
+            print("- ", i)
+        raise ValueError
+    else:
+        print("Pre-solve check passed")
+        diagnose_infeasibility(sections, classes, teachers)
+        
+
+    pre_check_time = time.perf_counter()
 
     # ---------------
     # Running Model 
@@ -119,7 +138,8 @@ if __name__ == "__main__":
         w_teacher_load_imbalance=1,
         w_undesirable_time=10,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=3000.0
+        max_time_in_seconds=180.0,
+        relative_gap_limit=0.1
         )
 
     result_time = time.perf_counter()
@@ -171,7 +191,8 @@ if __name__ == "__main__":
 
     end_time = time.perf_counter()
 
-    print(f"\nScheduler run time: {int(result_time - start_time)}s")
+    print(f"\nPre check run time: {int(pre_check_time - start_time)}s")
+    print(f"Scheduler run time: {int(result_time - pre_check_time)}s")
     print(f"Verification run time: {int(verification_time - result_time)}s")
     print(f"Output run time: {int(end_time - verification_time)}s")
     print(f"Total run time: {int(end_time - start_time)}s")

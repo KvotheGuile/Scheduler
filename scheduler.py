@@ -181,10 +181,32 @@ def generate_schedule(
                     )
 
     NUM_CLASSROOMS = len(classrooms)
-
+    used_room = [model.NewBoolVar(f"used_room_{k}") for k in range(NUM_CLASSROOMS)]
     room_id = {}
     for s in sections:
         room_id[s.id] = model.NewIntVar(0, NUM_CLASSROOMS - 1, f"room_{s.id}")
+
+    # room_indicator = {}  # (section_id, room_k) -> BoolVar, "section sid is in room k"
+
+    # for s in sections:
+    #     for k in range(NUM_CLASSROOMS):
+    #         b = model.NewBoolVar(f"room_ind_{s.id}_{k}")
+    #         model.Add(room_id[s.id] == k).OnlyEnforceIf(b)
+    #         model.Add(room_id[s.id] != k).OnlyEnforceIf(b.Not())
+    #         room_indicator[s.id, k] = b
+
+    # for k in range(NUM_CLASSROOMS):
+    #     indicators_for_k = [room_indicator[s.id, k] for s in sections]
+    #     model.AddMaxEquality(used_room[k], indicators_for_k)
+    # for k in range(NUM_CLASSROOMS - 1):
+    #     model.Add(used_room[k] >= used_room[k + 1])
+
+    # # Greedy hint: assign sections to lowest-numbered available room first,
+    # # per (day, start_block) time bucket -- doesn't need to be optimal,
+    # # just a reasonable starting point for the solver to refine.
+    # sorted_sections = sorted(sections, key=lambda s: s.id)
+    # for i, s in enumerate(sorted_sections):
+    #     model.AddHint(room_id[s.id], i % NUM_CLASSROOMS)
 
 
     # Build once, reuse everywhere instead of scanning assign.items() repeatedly
@@ -712,3 +734,239 @@ def verify_group_conflicts(result, sections, classes):
                 )
 
     return issues
+
+
+def pre_solve_sanity_checks(sections, classes, teachers, classroom_amount):
+    """Cheap checks that catch obvious infeasibilities without running
+    the solver. Returns a list of human-readable problem descriptions."""
+    class_lookup = {c.id: c for c in classes}
+    all_partials = (1, 2, 3)
+    problems = []
+    NUM_CLASSROOMS = classroom_amount
+
+    for s in sections:
+        cls = class_lookup[s.class_id]
+        n_blocks = blocks_needed(cls.duration_minutes)
+
+        # Check 1: does ANY teacher qualify for this class at all?
+        qualified = [t for t in teachers if cls.id in t.can_teach]
+        if not qualified:
+            problems.append(
+                f"Section {s.id}: NO teacher is qualified to teach class '{cls.id}'. "
+                f"Add {cls.id} to some teacher's can_teach set."
+            )
+            continue
+
+        # Check 2: of the qualified teachers, does any have enough load room?
+        load_ok = [t for t in qualified
+                   if cls.load * len(s.partials) <= t.max_load_total
+                   and cls.load <= t.max_load_per_partial]
+        if not load_ok:
+            problems.append(
+                f"Section {s.id}: {len(qualified)} teacher(s) qualified for '{cls.id}' "
+                f"({[t.id for t in qualified]}), but NONE have enough load capacity "
+                f"(class load={cls.load}, spans {len(s.partials)} partials -- "
+                f"needs max_load_total >= {cls.load * len(s.partials)} "
+                f"and max_load_per_partial >= {cls.load})."
+            )
+            continue
+
+        # Check 3: of the load-feasible teachers, does any have a long-enough
+        # contiguous availability window on ANY day for this class's duration?
+        time_ok = []
+        for t in load_ok:
+            for day in range(NUM_DAYS):
+                if valid_start_blocks(t, day, n_blocks):
+                    time_ok.append(t)
+                    break
+        if not time_ok:
+            problems.append(
+                f"Section {s.id}: {len(load_ok)} teacher(s) qualified and load-feasible "
+                f"for '{cls.id}' ({[t.id for t in load_ok]}), but NONE have a "
+                f"{cls.duration_minutes}-minute contiguous availability window on any day."
+            )
+
+    # Check 4: total simultaneous demand vs. room supply, per partial
+    # (rough upper bound -- doesn't guarantee feasibility, but catches
+    # gross over-subscription immediately)
+    for p in all_partials:
+        active_sections = [s for s in sections if p in s.partials]
+        # This is a coarse check: total sessions needed vs. total
+        # (room x day x block) capacity available in this partial.
+        total_sessions_needed = sum(
+            class_lookup[s.class_id].sessions_per_week for s in active_sections
+        )
+        total_room_slots_per_week = NUM_CLASSROOMS * NUM_DAYS * BLOCKS_PER_DAY
+        if total_sessions_needed > total_room_slots_per_week:
+            problems.append(
+                f"Partial {p}: {total_sessions_needed} sessions needed but only "
+                f"{total_room_slots_per_week} room-block-slots exist per week "
+                f"across {NUM_CLASSROOMS} rooms. Add more rooms or reduce sections."
+            )
+
+    return problems
+
+
+def diagnose_infeasibility(sections, classes, teachers, all_partials=(1,2,3), load_scale=100):
+    class_lookup = {c.id: c for c in classes}
+    section_lookup = {s.id: s for s in sections}
+
+    model = cp_model.CpModel()
+    teaches, assign = {}, {}
+
+    # Rebuild structural variables (unconditional -- these can't be "relaxed")
+    for s in sections:
+        cls = class_lookup[s.class_id]
+        for t in teachers:
+            if cls.id in t.can_teach:
+                teaches[s.id, t.id] = model.NewBoolVar(f"teaches_{s.id}_{t.id}")
+
+    for s in sections:
+        if not any(sid == s.id for (sid, tid) in teaches):
+            print(f"HARD FAIL (no relaxation possible): section {s.id} has no qualified teacher at all.")
+            return
+
+    for s in sections:
+        cls = class_lookup[s.class_id]
+        n_blocks = blocks_needed(cls.duration_minutes)
+        for t in teachers:
+            if (s.id, t.id) not in teaches:
+                continue
+            for day in range(NUM_DAYS):
+                for start in valid_start_blocks(t, day, n_blocks):
+                    assign[s.id, t.id, day, start] = model.NewBoolVar(f"a_{s.id}_{t.id}_{day}_{start}")
+
+    for s in sections:
+        if not any(sid == s.id for (sid, tid, d, st) in assign):
+            print(f"HARD FAIL (no relaxation possible): section {s.id} has no valid teacher+time combination.")
+            return
+
+    assumptions = {}
+
+    # Structural: exactly one teacher, correct session count -- kept hard
+    for s in sections:
+        vars_ = [v for (sid, tid), v in teaches.items() if sid == s.id]
+        model.Add(sum(vars_) == 1)
+
+    for (sid, tid, day, start), v in assign.items():
+        model.Add(v <= teaches[sid, tid])
+
+    for s in sections:
+        cls = class_lookup[s.class_id]
+        vars_ = [v for (sid, tid, d, st), v in assign.items() if sid == s.id]
+        model.Add(sum(vars_) == cls.sessions_per_week)
+        for day in range(NUM_DAYS):
+            day_vars = [v for (sid, tid, d, st), v in assign.items() if sid == s.id and d == day]
+            if day_vars:
+                model.Add(sum(day_vars) <= 1)
+
+    # Same-hour constraint -- SUSPECT, wrap in assumption per section
+    section_possible_starts = {}
+    for s in sections:
+        section_possible_starts[s.id] = {start for (sid, tid, d, start) in assign if sid == s.id}
+
+    uses_start = {}
+    for s in sections:
+        for start in section_possible_starts[s.id]:
+            uses_start[s.id, start] = model.NewBoolVar(f"uses_start_{s.id}_{start}")
+        vars_ = [uses_start[s.id, start] for start in section_possible_starts[s.id]]
+        if vars_:
+            label = f"same_hour_{s.id}"
+            a = model.NewBoolVar(label)
+            model.Add(sum(vars_) == 1).OnlyEnforceIf(a)
+            assumptions[label] = a
+
+    for (sid, tid, day, start), v in assign.items():
+        model.Add(v <= uses_start[sid, start])
+
+    # Teacher no-overlap -- SUSPECT
+    for t in teachers:
+        for p in all_partials:
+            intervals = []
+            for (sid, tid, day, start), v in assign.items():
+                if tid != t.id or p not in section_lookup[sid].partials:
+                    continue
+                cls = class_lookup[section_lookup[sid].class_id]
+                n_blocks = blocks_needed(cls.duration_minutes)
+                gs = day * BLOCKS_PER_DAY + start
+                intervals.append(model.NewOptionalIntervalVar(gs, n_blocks, gs + n_blocks, v, f"ti_{sid}_{day}_{start}_{p}"))
+            if intervals:
+                label = f"teacher_overlap_{t.id}_p{p}"
+                a = model.NewBoolVar(label)
+                # AddNoOverlap can't be directly reified; approximate via a
+                # relaxed alternative isn't native -- so instead flag this
+                # block as a WHOLE unit assumption (see note below)
+                model.AddNoOverlap(intervals)  # kept hard; see explanation below
+                # (teacher overlap is treated as structural/hard here --
+                #  see note under "Limitation" below)
+
+    # Group no-overlap -- SUSPECT (same limitation as above)
+    group_keys = {(s.major, s.semester, s.group_number) for s in sections}
+    for key in group_keys:
+        matching_ids = {s.id for s in sections if (s.major, s.semester, s.group_number) == key}
+        for p in all_partials:
+            intervals = []
+            for (sid, tid, day, start), v in assign.items():
+                if sid not in matching_ids or p not in section_lookup[sid].partials:
+                    continue
+                cls = class_lookup[section_lookup[sid].class_id]
+                n_blocks = blocks_needed(cls.duration_minutes)
+                gs = day * BLOCKS_PER_DAY + start
+                intervals.append(model.NewOptionalIntervalVar(gs, n_blocks, gs + n_blocks, v, f"gi_{key}_{sid}_{day}_{start}_{p}"))
+            if intervals:
+                model.AddNoOverlap(intervals)  # kept hard, same limitation
+
+    # Load caps -- SUSPECT, wrap in assumptions (these CAN be reified, unlike AddNoOverlap)
+    for t in teachers:
+        for p in all_partials:
+            terms = []
+            for s in sections:
+                if p not in s.partials:
+                    continue
+                key = (s.id, t.id)
+                if key in teaches:
+                    cls = class_lookup[s.class_id]
+                    terms.append(int(round(cls.load * load_scale)) * teaches[key])
+            if terms:
+                label = f"partial_load_{t.id}_p{p}"
+                a = model.NewBoolVar(label)
+                bound = int(round(t.max_load_per_partial * load_scale))
+                model.Add(sum(terms) <= bound).OnlyEnforceIf(a)
+                assumptions[label] = a
+
+    for t in teachers:
+        terms = []
+        for s in sections:
+            key = (s.id, t.id)
+            if key in teaches:
+                cls = class_lookup[s.class_id]
+                terms.append(int(round(cls.load * len(s.partials) * load_scale)) * teaches[key])
+        if terms:
+            label = f"total_load_{t.id}"
+            a = model.NewBoolVar(label)
+            bound = int(round(t.max_load_total * load_scale))
+            model.Add(sum(terms) <= bound).OnlyEnforceIf(a)
+            assumptions[label] = a
+
+    model.AddAssumptions(list(assumptions.values()))
+
+    solver = cp_model.CpSolver()
+    solver.parameters.log_search_progress = True  # prints search stats live
+    status = solver.Solve(model)
+
+    if status == cp_model.INFEASIBLE:
+        conflict = [label for label, var in assumptions.items()
+                    if var.index in solver.SufficientAssumptionsForInfeasibility()]
+        if conflict:
+            print("Minimal conflicting constraint set (relaxing ANY of these would help):")
+            for label in conflict:
+                print(f"  - {label}")
+        else:
+            print("INFEASIBLE, but not due to the assumption-wrapped constraints -- "
+                  "likely caused by the hard structural constraints (no-overlap for "
+                  "teachers/groups, or the base teacher/session-count requirements). "
+                  "Check pre_solve_sanity_checks() output, and consider whether "
+                  "availability windows are simply too narrow across the board.")
+    else:
+        print("Feasible once load-caps and same-hour constraints are treated as soft -- "
+              "your real bottleneck is teacher/group time-overlap (AddNoOverlap), not load.")
