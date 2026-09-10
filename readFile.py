@@ -42,7 +42,7 @@ def getTeachers(filename: str) -> list[Teacher]:
             can_teach=teacher_data["can_teach"],
             availability=getAvailability(teacher_data["availability"]),
             max_load_per_partial=teacher_data["max_load_total"],
-            max_load_total=teacher_data["max_load_total"]
+            max_load_total=teacher_data["max_load_total"] * 3
         )
         teachers.append(teacher)
     return teachers
@@ -61,7 +61,7 @@ def getSections(filename: str) -> list[Section]:
                 f"{group_number}"
             )
             section = Section(
-                id=generateId(section_name),
+                id=section_name,
                 major=section_data["major"],
                 semester=section_data["semester"],
                 class_id=section_data["class_id"],
