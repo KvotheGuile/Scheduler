@@ -102,6 +102,7 @@ def generate_schedule(
     all_partials: tuple[int, ...] = (1, 2, 3),
     load_scale: int = 100,
     max_time_in_seconds: float = 180.0,
+    relative_gap_limit = 0.05,
     w_teacher_gaps=10,
     w_days_used=5,
     w_teacher_load_imbalance=8,
@@ -110,24 +111,8 @@ def generate_schedule(
     w_group_balance=8,
     w_group_room=20,
     undesirable_start_blocks: set = None,
+    
 ):
-    """
-    Returns:
-        {
-            "status": "OPTIMAL" | "FEASIBLE" | "INFEASIBLE" | "UNKNOWN",
-            "by_section": {
-                section_id: {
-                    "teacher": teacher_id,
-                    "sessions": [{"day": d, "start_block": b, "start_time": "HH:MM",
-                                  "end_time": "HH:MM"}, ...]
-                }
-            },
-            "by_teacher": {
-                teacher_id: [{"section": sid, "day": d, "start_time": ..., "end_time": ...}, ...]
-            },
-        }
-    """
-
     class_lookup = {c.id: c for c in classes}
     section_lookup = {s.id: s for s in sections}
     teacher_lookup = {t.id: t for t in teachers}
@@ -546,6 +531,7 @@ def generate_schedule(
     # -----------------------------------------------------------------
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = max_time_in_seconds
+    solver.parameters.relative_gap_limit = relative_gap_limit
     solver.parameters.num_search_workers = 8
     solver.parameters.log_search_progress = True  # prints search stats live
     status = solver.Solve(model)

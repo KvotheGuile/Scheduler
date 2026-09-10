@@ -107,7 +107,7 @@ if __name__ == "__main__":
         w_teacher_load_imbalance=1,
         w_undesirable_time=10,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=20.0
+        max_time_in_seconds=60000.0
         )
 
     result_time = time.perf_counter()
