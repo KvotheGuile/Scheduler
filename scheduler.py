@@ -591,7 +591,8 @@ def generate_schedule(
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = max_time_in_seconds
     solver.parameters.relative_gap_limit = relative_gap_limit
-    solver.parameters.num_search_workers = 8
+    solver.parameters.num_search_workers = 0
+    solver.parameters.optimize_with_core = True  # sometimes much better for weighted-sum objectives with many terms
     solver.parameters.log_search_progress = True  # prints search stats live
 
     print(f"Variables: {len(model.Proto().variables)}")
