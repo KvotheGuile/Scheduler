@@ -130,6 +130,7 @@ def generate_schedule(
 
     class_lookup = {c.id: c for c in classes}
     section_lookup = {s.id: s for s in sections}
+    teacher_lookup = {t.id: t for t in teachers}
 
     model = cp_model.CpModel()
 
@@ -566,6 +567,8 @@ def generate_schedule(
         if solver.Value(v):
             sct = section_lookup[sid]
             cls = class_lookup[sct.class_id]
+            tch = teacher_lookup[tid]
+            
             n_blocks = blocks_needed(cls.duration_minutes)
             end_block = start + n_blocks
             session_info = {
@@ -590,12 +593,15 @@ def generate_schedule(
             full_schedule[(sid, tid, start)]["semestre"] = sct.semester
             full_schedule[(sid, tid, start)]["claseId"] = sct.class_id
             full_schedule[(sid, tid, start)]["profeId"] = tid
+            full_schedule[(sid, tid, start)]["claseNombre"] = cls.name
+            full_schedule[(sid, tid, start)]["profeNombre"] = tch.name
             full_schedule[(sid, tid, start)]["grupo"] = sct.group_number + 100 * partials_to_periods(cls.partials)
             full_schedule[(sid, tid, start)].setdefault("dias", [])
             full_schedule[(sid, tid, start)]["dias"].append(day)
             full_schedule[(sid, tid, start)]["horaInicio"] = block_to_time(start)
             full_schedule[(sid, tid, start)]["horaFinal"] = block_to_time(end_block)
             full_schedule[(sid, tid, start)]["salon"]  = classrooms[solver.Value(room_id[sid])]
+            full_schedule[(sid, tid, start)]["carga"] = cls.load
 
     for key in full_schedule:
         full_schedule[key]["dias"] = days_numbers_2_text(full_schedule[key]["dias"])
