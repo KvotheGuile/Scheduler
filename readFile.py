@@ -8,7 +8,7 @@ def readJson(filename):
 
     return data
 
-def getClassInfo(filename: str) -> list[ClassInfo]:
+def getClassesInfo(filename: str) -> list[ClassInfo]:
     ...
 
 
@@ -16,7 +16,7 @@ def getTeachers(filename: str) -> list[Teacher]:
     ...
 
 
-def getSection(filename: str) -> list[Section]:
+def getSections(filename: str) -> list[Section]:
     ...
 
 
