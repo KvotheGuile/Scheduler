@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from ortools.sat.python import cp_model
 from classes import ClassInfo, Section, Teacher 
+from collections import defaultdict
 
 SCALE = 100
 BLOCK_MINUTES = 30
@@ -123,18 +124,46 @@ def generate_schedule(
     # Variables
     # -----------------------------------------------------------------
 
-    # teaches[section_id, teacher_id] = 1 if this teacher owns this section
+    # -----------------------------------------------------------------
+    # Variables: teaches[section_id, teacher_id]
+    # Pre-filtered: skip pairs that are load-infeasible from the start,
+    # so we never create assign variables for them either.
+    # -----------------------------------------------------------------
     teaches = {}
+    skipped_pairs = []  # for diagnostics, see below
     for s in sections:
         cls = class_lookup[s.class_id]
         for t in teachers:
-            if cls.id in t.can_teach:
-                teaches[s.id, t.id] = model.NewBoolVar(f"teaches_{s.id}_{t.id}")
+            if cls.id not in t.can_teach:
+                continue  # not qualified -- already filtered before this change
 
+            # Minimum load this teacher would carry if given ONLY this section,
+            # for its full run across all partials it's active in.
+            min_possible_total_load = cls.load * len(s.partials)
+
+            # Minimum load in the single heaviest partial this section touches
+            # (a teacher could still be maxed out per-partial even if their
+            # total cap has room).
+            min_possible_partial_load = cls.load  # per active partial, same value each partial
+
+            if min_possible_total_load > t.max_load_total:
+                skipped_pairs.append((s.id, t.id, "exceeds max_load_total alone"))
+                continue
+
+            if min_possible_partial_load > t.max_load_per_partial:
+                skipped_pairs.append((s.id, t.id, "exceeds max_load_per_partial alone"))
+                continue
+
+            teaches[s.id, t.id] = model.NewBoolVar(f"teaches_{s.id}_{t.id}")
+
+    # Sanity check: every section must still have at least one viable teacher
     for s in sections:
         vars_ = [v for (sid, tid), v in teaches.items() if sid == s.id]
         if not vars_:
-            raise ValueError(f"No qualified teacher available for section {s.id}")
+            raise ValueError(
+                f"No qualified AND load-feasible teacher exists for section {s.id} "
+                f"-- check can_teach, max_load_total, and max_load_per_partial across teachers."
+            )
 
     # assign[section_id, teacher_id, day, start_block] = 1 if this session
     # starts there. Only created where the full duration fits in availability.
@@ -156,6 +185,18 @@ def generate_schedule(
     room_id = {}
     for s in sections:
         room_id[s.id] = model.NewIntVar(0, NUM_CLASSROOMS - 1, f"room_{s.id}")
+        
+
+    # Build once, reuse everywhere instead of scanning assign.items() repeatedly
+    by_teacher_partial = defaultdict(list)
+    by_group_partial = defaultdict(list)
+
+    for (sid, tid, day, start), v in assign.items():
+        s = section_lookup[sid]
+        key_group = (s.major, s.semester, s.group_number)
+        for p in s.partials:  # only iterate the partials this section is ACTUALLY in
+            by_teacher_partial[tid, p].append((sid, day, start, v))
+            by_group_partial[key_group, p].append((sid, day, start, v))
 
     # -----------------------------------------------------------------
     # Constraint 1: same class must occur at the same start_block every day
@@ -227,22 +268,18 @@ def generate_schedule(
     # -----------------------------------------------------------------
     for t in teachers:
         for p in all_partials:
+            entries = by_teacher_partial.get((t.id, p), [])
+            if not entries:
+                continue
             intervals = []
-            for (sid, tid, day, start), v in assign.items():
-                if tid != t.id:
-                    continue
-                if p not in section_lookup[sid].partials:
-                    continue
+            for sid, day, start, v in entries:
                 cls = class_lookup[section_lookup[sid].class_id]
                 n_blocks = blocks_needed(cls.duration_minutes)
                 global_start = day * BLOCKS_PER_DAY + start
-                interval = model.NewOptionalIntervalVar(
-                    global_start, n_blocks, global_start + n_blocks, v,
-                    f"ivl_teacher_{t.id}_{p}_{sid}_{day}_{start}"
-                )
-                intervals.append(interval)
-            if intervals:
-                model.AddNoOverlap(intervals)
+                intervals.append(model.NewOptionalIntervalVar(
+                    global_start, n_blocks, global_start + n_blocks, v, f"ivl_{sid}_{day}_{start}_{p}"
+                ))
+            model.AddNoOverlap(intervals)
 
     # -----------------------------------------------------------------
     # Constraint 5: no student group double-booked (interval-based),
