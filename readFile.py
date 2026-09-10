@@ -10,6 +10,25 @@ def readJson(filename):
 
     return data
 
+# config file
+def load_scheduler_config(path: str) -> dict:
+    """Loads config.json and returns a dict ready to unpack into
+    generate_schedule(**config)."""
+    with open(path, "r") as f:
+        raw = json.load(f)
+
+    config = {
+        "w_group_gaps": raw["w_group_gaps"],
+        "w_days_used": raw["w_days_used"],
+        "w_teacher_gaps": raw["w_teacher_gaps"],             
+        "w_load_imbalance": raw["w_teacher_load_imbalance"],
+        "w_undesirable_time": raw["w_undesirable_time"],
+        "undesirable_start_blocks": set(raw["undesirable_start_blocks"]),
+        "max_time_in_seconds": raw["max_time_in_seconds"],
+        "relative_gap_limit": raw["relative_gap_limit"],
+    }
+    return config
+
 # ----------------------------------
 # MAIN FUNCTIONS
 # ----------------------------------

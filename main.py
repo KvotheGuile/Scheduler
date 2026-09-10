@@ -1,7 +1,7 @@
 
 import time
 from classes import ClassInfo, Section, Teacher 
-from readFile import getClassesInfo, getRooms, getSections, getTeachers
+from readFile import getClassesInfo, getRooms, getSections, getTeachers, load_scheduler_config
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour, pre_solve_sanity_checks, diagnose_infeasibility
 from outputSchedule import jsonOutput
 
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     classes = getClassesInfo("input/materias.json")
     sections = getSections("input/carreras.json")
     classrooms = [ (f"{room.building} {room.id}") for room in getRooms("input/aulas.json")]    
+    config = load_scheduler_config("config.json")
 
     # ---------------
     # Pre-verify Model
@@ -69,15 +70,15 @@ if __name__ == "__main__":
         classes, 
         teachers,
         classrooms,
-        w_group_balance=5,
-        w_group_gaps=15,
-        w_days_used=0,
-        w_teacher_gaps=9,
-        w_teacher_load_imbalance=3,
-        w_undesirable_time=20,
+        w_group_balance=config["w_group_balance"],
+        w_group_gaps=config["w_group_gaps"],
+        w_days_used=config["w_days_used"],
+        w_teacher_gaps=config["w_teacher_gaps"],
+        w_teacher_load_imbalance=config["w_teacher_load_imbalance"],
+        w_undesirable_time=config["w_undesirable_time"],
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=3000.0,
-        relative_gap_limit=0.1
+        max_time_in_seconds=config["max_time_in_seconds"],
+        relative_gap_limit=config["relative_gap_limit"]
         )
 
     result_time = time.perf_counter()
