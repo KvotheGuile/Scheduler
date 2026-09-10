@@ -15,87 +15,12 @@ def time_range_to_blocks(start_hour, start_min, end_hour, end_min):
     return list(range(start_block, end_block))
 
 
-# --- Classes -----------------------------------------------------------
-classes = [
-    ClassInfo(id="DATABASES",  duration_minutes=120, sessions_per_week=4, partials={2, 3},    load=3.0, name="Databases Engineering"),
-    ClassInfo(id="ALGORITHMS", duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=3.0, name="Algorithms and Data Structures"),
-    ClassInfo(id="ETHICS",     duration_minutes= 90, sessions_per_week=2, partials={1},       load=2.0, name="Ethics"),
-    ClassInfo(id="WEBDEV",     duration_minutes= 90, sessions_per_week=2, partials={2, 3},    load=2.0, name="Web Development"),
-    ClassInfo(id="CALC1",      duration_minutes=120, sessions_per_week=3, partials={1, 2, 3}, load=4.0, name="Calculus I"),
-    ClassInfo(id="PE",         duration_minutes= 90, sessions_per_week=1, partials={2},       load=1.0, name="Pheasant Eagle"),
-    ClassInfo(id="M0125",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Math"),
-    ClassInfo(id="B0361",      duration_minutes=120, sessions_per_week=3, partials={1, 2}, load=1,   name="Physics"),
-    ClassInfo(id="M0404",      duration_minutes=120, sessions_per_week=5, partials={3},    load=1,   name="Chem")
-]
-
 # --- Teachers ------------------------------------------------------------
 def daily_availability(days, start_h, start_m, end_h, end_m):
     """Same time window on each listed day."""
     blocks = time_range_to_blocks(start_h, start_m, end_h, end_m)
     return [(d, b) for d in days for b in blocks]
 
-
-teachers = [
-    Teacher(
-        id="L0125",
-        name="Ana",
-        can_teach={"DATABASES", "ALGORITHMS", "WEBDEV", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 11, 0),
-        max_load_per_partial=6.0,
-        max_load_total=15.0,
-    ),
-    Teacher(
-        id="L0613",
-        name="Luis",
-        can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
-        max_load_per_partial=4.0,
-        max_load_total=10.0,
-    ),
-    Teacher(
-        id="L0999",
-        name="Samatha",
-        can_teach={"ALGORITHMS", "CALC1", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
-        max_load_per_partial=4.0,
-        max_load_total=10.0,
-    ),
-    Teacher(
-        id="L0456",
-        name="Leonor",
-        can_teach={"ALGORITHMS", "CALC1", "M0404", "M0125", "B0361"},
-        availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0),
-        max_load_per_partial=2,
-        max_load_total=2,
-    ),
-]
-
-# --- Sections --------------------------------------------------------------
-sections = [
-    Section(id="A1", major="SE", semester=3, class_id="M0125", group_number=1, partials={1, 2}),
-    Section(id="A2", major="SE", semester=3, class_id="M0125", group_number=2, partials={1, 2}),
-    Section(id="B1", major="SE", semester=3, class_id="B0361", group_number=1, partials={1, 2}),
-    Section(id="B2", major="SE", semester=3, class_id="B0361", group_number=2, partials={1, 2}),
-    Section(id="C1", major="SE", semester=3, class_id="M0404", group_number=1, partials={3}),
-    Section(id="C2", major="SE", semester=3, class_id="M0404", group_number=2, partials={3})
-]
-
-
-classrooms = [
-    "PEI 301",
-    "PEI 302"
-]
-
-for i in range(5):
-    sections.append(Section(id=f"E{i + 1}", major="SE", semester=5, class_id="B0361", group_number=i + 1, partials={1, 2}))
-    if i % 2 == 0:
-        teachers.append(Teacher(id=f"L037{i}", name=f"Teacher-{i + 1}", can_teach={"B0361"}, 
-                                availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0), 
-                                max_load_per_partial=15,
-                                max_load_total=15
-                                ))
-    if i % 2 == 0:
-        classrooms.append(f"KNEE 40{(i//3)+1}")
 
 if __name__ == "__main__":
 
@@ -111,7 +36,7 @@ if __name__ == "__main__":
     end_time = 0
 
     # ---------------
-    # Reading files
+    # Reading files & object parsing
     # ---------------
     teachers = getTeachers("input/profesores.json")
     classes = getClassesInfo("input/materias.json")
