@@ -185,7 +185,7 @@ def generate_schedule(
     room_id = {}
     for s in sections:
         room_id[s.id] = model.NewIntVar(0, NUM_CLASSROOMS - 1, f"room_{s.id}")
-        
+
 
     # Build once, reuse everywhere instead of scanning assign.items() repeatedly
     by_teacher_partial = defaultdict(list)
@@ -571,6 +571,10 @@ def generate_schedule(
     solver.parameters.relative_gap_limit = relative_gap_limit
     solver.parameters.num_search_workers = 8
     solver.parameters.log_search_progress = True  # prints search stats live
+
+    print(f"Variables: {len(model.Proto().variables)}")
+    print(f"Constraints: {len(model.Proto().constraints)}")
+
     status = solver.Solve(model)
 
     print(solver.ResponseStats())

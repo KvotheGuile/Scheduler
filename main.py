@@ -79,10 +79,22 @@ sections = [
     Section(id="C2", major="SE", semester=3, class_id="M0404", group_number=2, partials={3})
 ]
 
+
 classrooms = [
     "PEI 301",
     "PEI 302"
 ]
+
+for i in range(100):
+    sections.append(Section(id=f"E{i + 1}", major="SE", semester=5, class_id="B0361", group_number=i + 1, partials={1, 2}))
+    if i % 2 == 0:
+        teachers.append(Teacher(id="L037{i}", name=f"Teacher-{i + 1}", can_teach={"B0361"}, 
+                                availability=daily_availability([0, 1, 2, 3, 4], 7, 0, 21, 0), 
+                                max_load_per_partial=14,
+                                max_load_total=14
+                                ))
+    if i % 3 == 0:
+        classrooms.append(f"KNEE 40{(i//3)+1}")
 
 if __name__ == "__main__":
 
@@ -107,7 +119,7 @@ if __name__ == "__main__":
         w_teacher_load_imbalance=1,
         w_undesirable_time=10,
         undesirable_start_blocks=set([1 + 2 * (i//2) for i in range(28)]) | set(range(20, 28)),
-        max_time_in_seconds=60000.0
+        max_time_in_seconds=3000.0
         )
 
     result_time = time.perf_counter()
