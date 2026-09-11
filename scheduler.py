@@ -236,7 +236,6 @@ def generate_schedule(
     # Constraint 3: assign implies teaches; each section gets exactly
     # sessions_per_week distinct (day, start) sessions with its teacher.
     # Also: no two sessions of the SAME section on the same day
-    # (adjust here if your school allows double sessions same day).
     # -----------------------------------------------------------------
     for (sid, tid, day, start), v in assign.items():
         model.Add(v <= teaches[sid, tid])
