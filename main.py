@@ -38,10 +38,10 @@ if __name__ == "__main__":
     # ---------------
     # Reading files & object parsing
     # ---------------
-    teachers = getTeachers("input/profesores.json")
-    classes = getClassesInfo("input/materias.json")
-    sections = getSections("input/carreras.json")
-    classrooms = [ (f"{room.building} {room.id}") for room in getRooms("input/aulas.json")]    
+    teachers = getTeachers("data/profesores.json")
+    classes = getClassesInfo("data/materias.json")
+    sections = getSections("data/carreras.json")
+    classrooms = [ (f"{room.building} {room.id}") for room in getRooms("data/aulas.json")]    
     config = load_scheduler_config("config.json")
 
     # ---------------
