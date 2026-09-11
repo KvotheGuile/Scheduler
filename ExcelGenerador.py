@@ -390,7 +390,7 @@ def generar(ruta_json, ruta_salida):
     wb.save(ruta_salida)
     print(f"Listo: {ruta_salida} ({len(datos)} clases, {len(semestres)} hoja(s))")
 
-
-nombre_json = "schedule.json"
-nombre_salida = "salida.xlsx"
-generar(nombre_json, nombre_salida)
+if __name__ == "main":
+    nombre_json = "schedule.json"
+    nombre_salida = "salida.xlsx"
+    generar(nombre_json, nombre_salida)
