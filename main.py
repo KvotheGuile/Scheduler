@@ -4,6 +4,7 @@ from classes import ClassInfo, Section, Teacher
 from readFile import getClassesInfo, getRooms, getSections, getTeachers, load_scheduler_config
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour, pre_solve_sanity_checks, diagnose_infeasibility
 from outputSchedule import jsonOutput
+from ExcelGenerador import generar
 
 
 DAY_START_HOUR = 7
@@ -125,6 +126,7 @@ if __name__ == "__main__":
 
         print()
         jsonOutput(result["schedule"])
+        generar("output/schedule.json", "output/schedule.xlsx")
     else:
         print("No feasible schedule found with current constraints.")
 
