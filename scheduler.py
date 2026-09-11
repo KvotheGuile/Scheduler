@@ -156,7 +156,7 @@ def generate_schedule(
 
             teaches[s.id, t.id] = model.NewBoolVar(f"teaches_{s.id}_{t.id}")
 
-    # Sanity check: every section must still have at least one viable teacher
+    # Every section must still have at least one viable teacher
     for s in sections:
         vars_ = [v for (sid, tid), v in teaches.items() if sid == s.id]
         if not vars_:
@@ -186,30 +186,6 @@ def generate_schedule(
     for s in sections:
         room_id[s.id] = model.NewIntVar(0, NUM_CLASSROOMS - 1, f"room_{s.id}")
 
-    # room_indicator = {}  # (section_id, room_k) -> BoolVar, "section sid is in room k"
-
-    # for s in sections:
-    #     for k in range(NUM_CLASSROOMS):
-    #         b = model.NewBoolVar(f"room_ind_{s.id}_{k}")
-    #         model.Add(room_id[s.id] == k).OnlyEnforceIf(b)
-    #         model.Add(room_id[s.id] != k).OnlyEnforceIf(b.Not())
-    #         room_indicator[s.id, k] = b
-
-    # for k in range(NUM_CLASSROOMS):
-    #     indicators_for_k = [room_indicator[s.id, k] for s in sections]
-    #     model.AddMaxEquality(used_room[k], indicators_for_k)
-    # for k in range(NUM_CLASSROOMS - 1):
-    #     model.Add(used_room[k] >= used_room[k + 1])
-
-    # # Greedy hint: assign sections to lowest-numbered available room first,
-    # # per (day, start_block) time bucket -- doesn't need to be optimal,
-    # # just a reasonable starting point for the solver to refine.
-    # sorted_sections = sorted(sections, key=lambda s: s.id)
-    # for i, s in enumerate(sorted_sections):
-    #     model.AddHint(room_id[s.id], i % NUM_CLASSROOMS)
-
-
-    # Build once, reuse everywhere instead of scanning assign.items() repeatedly
     by_teacher_partial = defaultdict(list)
     by_group_partial = defaultdict(list)
 
@@ -222,7 +198,6 @@ def generate_schedule(
 
     # -----------------------------------------------------------------
     # Constraint 1: same class must occur at the same start_block every day
-    # it meets (e.g. always 10:00am on whichever days it runs).
     # -----------------------------------------------------------------
 
     # Collect the set of start_blocks that are actually reachable for each
