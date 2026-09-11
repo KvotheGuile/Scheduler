@@ -1,0 +1,1024 @@
+[
+  {
+    "id": "MA1004B",
+    "major": "ICT26",
+    "semester": 2,
+    "name": "Estadística y manejo de datos",
+    "partials": [
+      2
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MA1005B",
+    "major": "ICT26",
+    "semester": 2,
+    "name": "Álgebra matricial y métodos numéricos",
+    "partials": [
+      3
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 4,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MA1057",
+    "major": "ICT26",
+    "semester": 2,
+    "name": "Matemáticas discretas",
+    "partials": [
+      5
+    ],
+    "load": 2.0,
+    "udca": 2.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "TC1039",
+    "major": "ICT26",
+    "semester": 2,
+    "name": "Programación orientada a objetos",
+    "partials": [
+      6
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2001B",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Desarrollo de proyectos con visión sistémica(Coordinador)",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2001B.1",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Desarrollo de proyectos con visión sistémica (M1 - Introducción cadena de valor)",
+    "partials": [
+      1
+    ],
+    "load": 0.8,
+    "udca": 4.0,
+    "porcentaje_roster": 20.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2001B.2",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Desarrollo de proyectos con visión sistémica (M2 - Análisis de situación)",
+    "partials": [
+      1
+    ],
+    "load": 0.8,
+    "udca": 4.0,
+    "porcentaje_roster": 20.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2001B.3",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Desarrollo de proyectos con visión sistémica (M3 - Aplicación técnicas participativas)",
+    "partials": [
+      1
+    ],
+    "load": 1.2,
+    "udca": 4.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2001B.4",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Desarrollo de proyectos con visión sistémica (M4 - Etapas y herramientas desarrollo de proyecto)",
+    "partials": [
+      1
+    ],
+    "load": 1.2,
+    "udca": 4.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2002B",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Mejora de un proceso organizacional con métodos estadísticos (Coordinador)",
+    "partials": [
+      2
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2002B.1",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Mejora de un proceso organizacional con métodos estadísticos (M1 - Competitividad)",
+    "partials": [
+      2
+    ],
+    "load": 0.4,
+    "udca": 4.0,
+    "porcentaje_roster": 10.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2002B.2",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Mejora de un proceso organizacional con métodos estadísticos (M2 - Métricas de desempeño)",
+    "partials": [
+      2
+    ],
+    "load": 0.28,
+    "udca": 4.0,
+    "porcentaje_roster": 7.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2002B.3",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Mejora de un proceso organizacional con métodos estadísticos (M3 - Metodología y Herramientas Mejora Continua)",
+    "partials": [
+      2
+    ],
+    "load": 2.8,
+    "udca": 4.0,
+    "porcentaje_roster": 70.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2002B.4",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Mejora de un proceso organizacional con métodos estadísticos (M4 - Administración de operaciones como estrategia competitiva)",
+    "partials": [
+      2
+    ],
+    "load": 0.48,
+    "udca": 4.0,
+    "porcentaje_roster": 15.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2003B",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Conceptualización de procesos con enfoque innovador (Coordinador)",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2003B.1",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Conceptualización de procesos con enfoque innovador (M1 - Vigilancia tecnológica permanente)",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 4.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2003B.2",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Conceptualización de procesos con enfoque innovador (M2 - Necesidades y oportunidades en la innovación)",
+    "partials": [
+      3
+    ],
+    "load": 1.52,
+    "udca": 4.0,
+    "porcentaje_roster": 38.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2003B.3",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Conceptualización de procesos con enfoque innovador (M3 - Técnicas de creatividad en la innovación)",
+    "partials": [
+      3
+    ],
+    "load": 1.52,
+    "udca": 4.0,
+    "porcentaje_roster": 38.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2032",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Análisis estadístico de datos",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2037",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Diseño de sistemas ciberfísicos",
+    "partials": [
+      2
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2038",
+    "major": "IIS19",
+    "semester": 4,
+    "name": "Evaluación económica de proyectos",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2007B",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Diseño disruptivo de procesos (Coordinación)",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 1.5,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2007B.1",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Diseño disruptivo de procesos (M1 - Métodos de Investigación + Reto M1)",
+    "partials": [
+      1
+    ],
+    "load": 1.3,
+    "udca": 5.0,
+    "porcentaje_roster": 26.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2007B.2",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Diseño disruptivo de procesos (M2 - Metodologías y modelos en innovación de procesos + Reto M2)",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 5.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2007B.3",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Diseño disruptivo de procesos (M3 - Diseño de procesos + Reto M3)",
+    "partials": [
+      1
+    ],
+    "load": 2.2,
+    "udca": 5.0,
+    "porcentaje_roster": 44.0,
+    "sessions_per_week": 4,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2008B",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Aseguramiento de la excelencia operacional (Coordinación)",
+    "partials": [
+      2
+    ],
+    "load": 1.5,
+    "udca": 1.5,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2008B.1",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Aseguramiento de la excelencia operacional (M1 - Herramientas y técnicas para la generación de valor + Reto M1)",
+    "partials": [
+      2
+    ],
+    "load": 1.2,
+    "udca": 5.0,
+    "porcentaje_roster": 24.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2008B.2",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Aseguramiento de la excelencia operacional (M2 - Confiabilidad humana + Reto M2)",
+    "partials": [
+      2
+    ],
+    "load": 1.2,
+    "udca": 5.0,
+    "porcentaje_roster": 24.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2008B.3",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Aseguramiento de la excelencia operacional (M3 - Confiabilidad en los procesos + Reto M3)",
+    "partials": [
+      2
+    ],
+    "load": 1.3,
+    "udca": 5.0,
+    "porcentaje_roster": 26.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2008B.4",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Aseguramiento de la excelencia operacional (M4 - Confiabilidad en el equipo + Reto M4)",
+    "partials": [
+      2
+    ],
+    "load": 1.3,
+    "udca": 5.0,
+    "porcentaje_roster": 26.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (Coordinación)",
+    "partials": [
+      3
+    ],
+    "load": 1.5,
+    "udca": 1.5,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B.1",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (M1 - Análisis de sistemas logísticos y cadenas de suministro + Reto M1)",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 5.0,
+    "porcentaje_roster": 20.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B.2",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (M2 - Sistemas de información para la administración de la cadena de suministros + Reto M2)",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 5.0,
+    "porcentaje_roster": 20.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B.3",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (M3 - Modelación de la cadena de suministro + Reto M3)",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 5.0,
+    "porcentaje_roster": 20.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B.4",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (M4 - Modelos matemáticos para el diseño, planeación y operación de cadenas de suministro + Reto M4)",
+    "partials": [
+      3
+    ],
+    "load": 1.4,
+    "udca": 5.0,
+    "porcentaje_roster": 28.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2009B.5",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Mejora de una cadena de valor (M5 - Ecosistemas de competencia + Reto M5)",
+    "partials": [
+      3
+    ],
+    "load": 0.6,
+    "udca": 5.0,
+    "porcentaje_roster": 12.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2042",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Modelación de la cadena de valor",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2043",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Simulación discreta, continua",
+    "partials": [
+      2
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "IN2044",
+    "major": "IIS19",
+    "semester": 6,
+    "name": "Diseño de un proceso de consultoría y gestión del cambio",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "M2001B",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de materiales y manufactura (Coordinación)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 4,
+    "duration_minutes": 120
+  },
+  {
+    "id": "M2001B.1",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de materiales y manufactura (M1 - Dibujo + RETO)",
+    "partials": [
+      5
+    ],
+    "load": 1.4,
+    "udca": 4.0,
+    "porcentaje_roster": 35.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "M2001B.2",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de materiales y manufactura (M2 - Materiales + RETO)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 4.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "M2001B.3",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de materiales y manufactura (M3 - Manufactura + RETO)",
+    "partials": [
+      5
+    ],
+    "load": 1.6,
+    "udca": 4.0,
+    "porcentaje_roster": 40.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "M2005",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de mecanismos",
+    "partials": [
+      2
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2003B",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Integración mecatrónica (Coordinación)",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2003B.1",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Integración mecatrónica (M1 - Circuitos de corriente alterna + RETO)",
+    "partials": [
+      1
+    ],
+    "load": 1.2,
+    "udca": 4.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2003B.2",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Integración mecatrónica (M2 - Sistemas lógicos de control + RETO)",
+    "partials": [
+      1
+    ],
+    "load": 1.2,
+    "udca": 4.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2003B.3",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Integración mecatrónica (M3 - Mecánica de Materiales + RETO)",
+    "partials": [
+      1
+    ],
+    "load": 1.2,
+    "udca": 4.0,
+    "porcentaje_roster": 30.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2003B.4",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Integración mecatrónica (Administración de Proyectos + RETO)",
+    "partials": [
+      1
+    ],
+    "load": 0.4,
+    "udca": 4.0,
+    "porcentaje_roster": 10.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (Coordinador)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B.1",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (M1 - Desarrollo de prototipos)",
+    "partials": [
+      5
+    ],
+    "load": 0.4,
+    "udca": 4.0,
+    "porcentaje_roster": 10.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B.2",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (M2 - Elementos de máquinas)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 4.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B.3",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (M3 - Microcontroladores)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 4.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B.4",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (M4 - Electrónica)",
+    "partials": [
+      5
+    ],
+    "load": 1.0,
+    "udca": 4.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2004B.5",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Implementación de sistemas mecatrónicos (M5 - Instrumentación)",
+    "partials": [
+      5
+    ],
+    "load": 0.6,
+    "udca": 4.0,
+    "porcentaje_roster": 15.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2022",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Análisis de elementos de la mecatrónica",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2023",
+    "major": "IMT19",
+    "semester": 4,
+    "name": "Modelación y automatización",
+    "partials": [
+      3
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (Coordinación)",
+    "partials": [
+      5
+    ],
+    "load": 2.0,
+    "udca": 2.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B.1",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (M1 - Introducción a la manufactura)",
+    "partials": [
+      5
+    ],
+    "load": 0.6,
+    "udca": 12.0,
+    "porcentaje_roster": 5.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B.2",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (M2 - Tecnologías de automatización de la manufactura)",
+    "partials": [
+      5
+    ],
+    "load": 2.04,
+    "udca": 12.0,
+    "porcentaje_roster": 17.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B.3",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (M3 - Fundamentos y aplicación de las redes industriales para la integración de sistemas de manufactura)",
+    "partials": [
+      5
+    ],
+    "load": 2.04,
+    "udca": 12.0,
+    "porcentaje_roster": 17.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B.4",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (M4 - Diseño e integración de Sistemas de Manufactura Automatizados (SMA))",
+    "partials": [
+      5
+    ],
+    "load": 2.04,
+    "udca": 12.0,
+    "porcentaje_roster": 17.0,
+    "sessions_per_week": 1,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR2007B.5",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Automatización de sistemas de manufactura (M5 - Modelación de sistemas de manufactura)",
+    "partials": [
+      5
+    ],
+    "load": 2.04,
+    "udca": 12.0,
+    "porcentaje_roster": 17.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR3001B",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Diseño y desarrollo de robots (Coordinación)",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 1.5,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR3001B.1",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Diseño y desarrollo de robots (M1 - Introducción y Cinemática )",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 6.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR3001B.2",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Diseño y desarrollo de robots (M2 - Visión)",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 6.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR3001B.3",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Diseño y desarrollo de robots (M3 - Control de robots )",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 6.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MR3001B.4",
+    "major": "IMT19",
+    "semester": 6,
+    "name": "Diseño y desarrollo de robots (M4 - Robótica móvil)",
+    "partials": [
+      1
+    ],
+    "load": 1.5,
+    "udca": 6.0,
+    "porcentaje_roster": 25.0,
+    "sessions_per_week": 2,
+    "duration_minutes": 120
+  },
+  {
+    "id": "F1028B",
+    "major": "ING26",
+    "semester": 2,
+    "name": "Fundamentos de termodinámica",
+    "partials": [
+      3
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 4,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MA1004B",
+    "major": "ING26",
+    "semester": 2,
+    "name": "Estadística y manejo de datos",
+    "partials": [
+      2
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 4,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MA1055",
+    "major": "ING26",
+    "semester": 2,
+    "name": "Cálculo multivariable",
+    "partials": [
+      1
+    ],
+    "load": 1.0,
+    "udca": 1.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "MA1056",
+    "major": "ING26",
+    "semester": 2,
+    "name": "Álgebra lineal",
+    "partials": [
+      5
+    ],
+    "load": 2.0,
+    "udca": 2.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 3,
+    "duration_minutes": 120
+  },
+  {
+    "id": "Q1030",
+    "major": "ING26",
+    "semester": 2,
+    "name": "Fundamentos de química",
+    "partials": [
+      6
+    ],
+    "load": 3.0,
+    "udca": 3.0,
+    "porcentaje_roster": 100.0,
+    "sessions_per_week": 5,
+    "duration_minutes": 120
+  }
+]
