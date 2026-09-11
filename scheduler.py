@@ -70,7 +70,7 @@ def partials_to_periods(partials: set[int]) -> int:
         return 3
     elif second:
         return 2
-    elif second:
+    elif first:
         return 1
     return 7
 
