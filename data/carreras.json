@@ -1,0 +1,659 @@
+[
+  {
+    "major": "ICT26",
+    "semester": 2,
+    "class_id": "MA1004B",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "ICT26",
+    "semester": 2,
+    "class_id": "MA1005B",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "ICT26",
+    "semester": 2,
+    "class_id": "MA1057",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "ICT26",
+    "semester": 2,
+    "class_id": "TC1039",
+    "cantidad_grupos": 1,
+    "partials": [
+      6
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2001B",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2001B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2001B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2001B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2001B.4",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2002B",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2002B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2002B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2002B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2002B.4",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2003B",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2003B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2003B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2003B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2032",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2037",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 4,
+    "class_id": "IN2038",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2007B",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2007B.1",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2007B.2",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2007B.3",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2008B",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2008B.1",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2008B.2",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2008B.3",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2008B.4",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B.1",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B.2",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B.3",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B.4",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2009B.5",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2042",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2043",
+    "cantidad_grupos": 1,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IIS19",
+    "semester": 6,
+    "class_id": "IN2044",
+    "cantidad_grupos": 1,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "M2001B",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "M2001B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "M2001B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "M2001B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "M2005",
+    "cantidad_grupos": 2,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2003B",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2003B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2003B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2003B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2003B.4",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B.1",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B.2",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B.3",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B.4",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2004B.5",
+    "cantidad_grupos": 2,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2022",
+    "cantidad_grupos": 2,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 4,
+    "class_id": "MR2023",
+    "cantidad_grupos": 2,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B.1",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B.2",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B.3",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B.4",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR2007B.5",
+    "cantidad_grupos": 1,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR3001B",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR3001B.1",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR3001B.2",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR3001B.3",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "IMT19",
+    "semester": 6,
+    "class_id": "MR3001B.4",
+    "cantidad_grupos": 1,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "ING26",
+    "semester": 2,
+    "class_id": "F1028B",
+    "cantidad_grupos": 3,
+    "partials": [
+      3
+    ]
+  },
+  {
+    "major": "ING26",
+    "semester": 2,
+    "class_id": "MA1004B",
+    "cantidad_grupos": 3,
+    "partials": [
+      2
+    ]
+  },
+  {
+    "major": "ING26",
+    "semester": 2,
+    "class_id": "MA1055",
+    "cantidad_grupos": 4,
+    "partials": [
+      1
+    ]
+  },
+  {
+    "major": "ING26",
+    "semester": 2,
+    "class_id": "MA1056",
+    "cantidad_grupos": 3,
+    "partials": [
+      5
+    ]
+  },
+  {
+    "major": "ING26",
+    "semester": 2,
+    "class_id": "Q1030",
+    "cantidad_grupos": 3,
+    "partials": [
+      6
+    ]
+  }
+]

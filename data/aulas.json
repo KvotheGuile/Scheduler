@@ -1,0 +1,70 @@
+[
+  {
+    "id": "101",
+    "building": "PEI"
+  },
+  {
+    "id": "SE1",
+    "building": "PEI"
+  },
+  {
+    "id": "SE2",
+    "building": "PEI"
+  },
+  {
+    "id": "301",
+    "building": "PEI"
+  },
+  {
+    "id": "302",
+    "building": "PEI"
+  },
+  {
+    "id": "303",
+    "building": "PEI"
+  },
+  {
+    "id": "304",
+    "building": "PEI"
+  },
+  {
+    "id": "305",
+    "building": "PEI"
+  },
+  {
+    "id": "3101",
+    "building": "EIII"
+  },
+  {
+    "id": "3105",
+    "building": "EIII"
+  },
+  {
+    "id": "3106",
+    "building": "EIII"
+  },
+  {
+    "id": "3109",
+    "building": "EIII"
+  },
+  {
+    "id": "3110",
+    "building": "EIII"
+  },
+  {
+    "id": "3111",
+    "building": "EIII"
+  },
+  {
+    "id": "3112",
+    "building": "EIII"
+  },
+  {
+    "id": "INNOV",
+    "building": "EIII"
+  },
+  {
+    "id": "SC1",
+    "building": "EIII"
+  }
+]
