@@ -87,6 +87,10 @@ def getSections(filename: str) -> list[Section]:
                 group_number=group_number,
                 partials=calculatePartials(section_data["partials"])
             )
+
+            if section.class_id[-1] == "B":
+                continue
+
             sections.append(section)
     return sections
 
