@@ -18,6 +18,7 @@ def load_scheduler_config(path: str) -> dict:
         raw = json.load(f)
 
     config = {
+        "w_group_balance": raw["w_group_balance"],
         "w_group_gaps": raw["w_group_gaps"],
         "w_days_used": raw["w_days_used"],
         "w_teacher_gaps": raw["w_teacher_gaps"],             
