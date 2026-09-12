@@ -1,7 +1,3 @@
-
-#Para usar: python extraer_excel.py archivo.xlsx --salida data
-
-import argparse
 import json
 import math
 import re
@@ -21,7 +17,7 @@ def normalizar(valor):
 
 
 def filas(libro, nombre, columnas):
-    #Lee solo columnas declaradas.
+    #Lee solo columnas declaradas
     hojas = {normalizar(s.title): s for s in libro}
     if normalizar(nombre) not in hojas:
         raise ValueError(f"Falta la hoja {nombre!r}")
@@ -197,31 +193,23 @@ def extraer(libro, dias_semana=DIAS):
             "profesores": list(profesores.values()), "aulas": aulas}
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("excel", type=Path)
-    parser.add_argument("--salida", type=Path, default=Path("data"))
-    parser.add_argument("--dias", default="LuMaMiJuViSaDo",
-                        help="Días de la semana disponibles por defecto")
-    args = parser.parse_args()
+def generar_json(excel, salida="data", dias_semana="LuMaMiJuViSaDo"):
+ 
+    excel, salida = Path(excel), Path(salida)
+    dias_elegidos = dias(dias_semana)
+    if excel.suffix.lower() != ".xlsx":
+        raise ValueError("El archivo debe ser .xlsx")
+    libro = load_workbook(excel, data_only=True)
     try:
-        if args.excel.suffix.lower() != ".xlsx":
-            raise ValueError("El archivo debe ser .xlsx")
-        libro = load_workbook(args.excel, data_only=True)
-        try:
-            datos = extraer(libro, dias(args.dias))
-        finally:
-            libro.close()
-        # Primero se valida todo. Los errores de datos no producen JSON parciales.
-        args.salida.mkdir(parents=True, exist_ok=True)
-        for nombre, registros in datos.items():
-            destino = args.salida / f"{nombre}.json"
-            destino.write_text(json.dumps(registros, ensure_ascii=False,
-                                          indent=2, allow_nan=False) + "\n", encoding="utf-8")
-            print(f"{destino}: {len(registros)} registros")
-    except (ValueError, OSError) as error:
-        parser.exit(1, f"Error: {error}\n")
-
-
-if __name__ == "__main__":
-    main()
+        datos = extraer(libro, dias_elegidos)
+    finally:
+        libro.close()
+    # Primero se valida todo; errores de datos no producen JSON parciales.
+    salida.mkdir(parents=True, exist_ok=True)
+    rutas = {}
+    for nombre, registros in datos.items():
+        destino = salida / f"{nombre}.json"
+        destino.write_text(json.dumps(registros, ensure_ascii=False,
+                                      indent=2, allow_nan=False) + "\n", encoding="utf-8")
+        rutas[nombre] = destino
+    return rutas
