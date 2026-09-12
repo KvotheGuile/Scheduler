@@ -213,3 +213,14 @@ def generar_json(excel, salida="data", dias_semana="LuMaMiJuViSaDo"):
                                       indent=2, allow_nan=False) + "\n", encoding="utf-8")
         rutas[nombre] = destino
     return rutas
+
+def leer_excel():
+    base = Path(__file__).resolve().parent
+    # Configura todos los parámetros aquí. También puedes usar rutas absolutas.
+    rutas = generar_json(
+        excel=base / "input" / "scheduler_dummy_data_.xlsx",
+        salida=base / "data",
+        dias_semana="LuMaMiJuViSaDo",
+    )
+    for nombre, ruta in rutas.items():
+        print(f"{nombre}: {ruta}")

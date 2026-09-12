@@ -5,6 +5,7 @@ from readFile import getClassesInfo, getRooms, getSections, getTeachers, load_sc
 from scheduler import generate_schedule, verify_schedule, verify_group_conflicts, verify_same_hour, pre_solve_sanity_checks, diagnose_infeasibility
 from outputSchedule import jsonOutput
 from ExcelGenerador import generar
+from extraer_excel2 import leer_excel
 
 
 DAY_START_HOUR = 7
@@ -39,6 +40,9 @@ if __name__ == "__main__":
     # ---------------
     # Reading files & object parsing
     # ---------------
+
+    leer_excel()
+
     teachers = getTeachers("data/profesores.json")
     classes = getClassesInfo("data/materias.json")
     sections = getSections("data/carreras.json")
